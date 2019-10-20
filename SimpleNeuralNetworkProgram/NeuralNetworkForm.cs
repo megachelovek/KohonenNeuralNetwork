@@ -23,6 +23,10 @@ namespace SimpleNeuralNetworkProgram
             inputChart.Series["InputVectors"].ChartType = SeriesChartType.Point;
             outputChart.Series.Add("OutputVectors");
             outputChart.Series["OutputVectors"].ChartType = SeriesChartType.Point;
+            inputChart.ChartAreas[0].AxisX.Enabled = AxisEnabled.Auto;
+            inputChart.ChartAreas[0].AxisY.Enabled = AxisEnabled.Auto;
+            outputChart.ChartAreas[0].AxisX.Enabled = AxisEnabled.Auto;
+            outputChart.ChartAreas[0].AxisY.Enabled = AxisEnabled.Auto;
         }
 
         private void ShowInputVectorsOnChart()
@@ -42,11 +46,12 @@ namespace SimpleNeuralNetworkProgram
                 for (int i = 0; i < nn.OutputLayerDimension; i++)
                 for (int j = 0; j < nn.OutputLayerDimension; j++)
                 {
-                    outputChart.Series["OutputVectors"].Points
-                        .AddXY(nn.OutputLayer[i, j].Weights[0], nn.OutputLayer[i, j].Weights[1]);
-                }
+                        outputChart.Series["OutputVectors"].Points
+                        .AddXY((double.TryParse(nn.OutputLayer[i, j].Weights[0].ToString(),out double d)) ? d : 0, (double.TryParse(nn.OutputLayer[i, j].Weights[1].ToString(), out double f)) ? f : 0);
+                        //outputChart.Series["OutputVectors"].Points
+                        //    .AddXY(nn.OutputLayer[i, j].Weights[0], nn.OutputLayer[i, j].Weights[1]);
+                    }
             }
-
             Application.DoEvents();
         }
 

@@ -47,20 +47,19 @@ namespace NeuralNetworkLibrary
                 case Functions.EuclideanMeasure:
                     {
                         distance = Math.Sqrt(Math.Pow((winnerCoordinate.X - coordinate.X), 2) - Math.Pow((winnerCoordinate.Y - coordinate.Y), 2)); //Евклидова мера 
-                        for (int i = 0; i < countOfNeurons; i++)
-                        {
-                            result += distance;
-                        }
+                        
 
-                        return result;
+                        //result *= 0.0001;
+                        return distance;
                     }
                     break;
-                    //case Functions.Gaus:
-                    //    {
-                    //        distance = Math.Sqrt(Math.Pow((winnerCoordinate.X - coordinate.X), 2) + Math.Pow((winnerCoordinate.Y - coordinate.Y), 2));
-                    //        result = Math.Exp(-(distance * distance) / (Math.Pow(Sigma(iteration), 2)));
-                    //        break;
-                    //    }
+                case Functions.Gaus:
+                    {
+                        distance = Math.Sqrt(Math.Pow((winnerCoordinate.X - coordinate.X), 2) + Math.Pow((winnerCoordinate.Y - coordinate.Y), 2));
+                        result = Math.Exp(-(distance * distance) / (Math.Pow(Sigma(iteration), 2)));
+                        return result;
+                        break;
+                    }
                     //case Functions.MexicanHat:
                     //    {
                     //        distance = Math.Sqrt(Math.Pow((winnerCoordinate.X - coordinate.X), 2) + Math.Pow((winnerCoordinate.Y - coordinate.Y), 2));

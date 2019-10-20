@@ -69,7 +69,7 @@ namespace NeuralNetworkLibrary
             for (int i = 0; i < outputLayerDimension; i++)
                 for (int j = 0; j < outputLayerDimension; j++)
                 {
-                    currentEpsilon += outputLayer[i, j].ModifyWeights(pattern, Winner.Coordinate, currentIteration, function);
+                    currentEpsilon += outputLayer[i, j].ModifyWeights(pattern, Winner.Coordinate, currentIteration, function, Math.Pow(outputLayerDimension,2));
                 }
             currentIteration++;
             currentEpsilon = Math.Abs(currentEpsilon / (outputLayerDimension * outputLayerDimension));
@@ -162,7 +162,7 @@ namespace NeuralNetworkLibrary
             int k = 0;
             int randomColor = 0;
             Random r = new Random();
-            while (usedColors.Count != numOfClasses)//Бесконечный цикл
+            while (usedColors.Count != numOfClasses)
             {
                 k = 0;
                 randomColor = r.Next(goodColors.Count);
@@ -182,9 +182,9 @@ namespace NeuralNetworkLibrary
             return colorMatrix;
         }
 
-        public NeuralNetwork(int m, int numberOfIterations, double epsilon, Functions f)
+        public NeuralNetwork(int sqrtOfCountNeurons, int numberOfIterations, double epsilon, Functions f)
         {
-            outputLayerDimension = m;
+            outputLayerDimension = sqrtOfCountNeurons;
             currentIteration = 1;
             this.numberOfIterations = numberOfIterations;
             function = f;
@@ -241,7 +241,7 @@ namespace NeuralNetworkLibrary
                 }
             }
             else
-            {
+            {//Этот вариант не используется
                 while (iterations <= numberOfIterations && currentEpsilon > epsilon)
                 {
                     List<List<double>> patternsToLearn = new List<List<double>>(numberOfPatterns);
@@ -278,7 +278,7 @@ namespace NeuralNetworkLibrary
             }
 
             inputLayerDimension = k;
-            int sigma0 = outputLayerDimension;
+            int sigma0 = outputLayerDimension; 
 
             outputLayer = new Neuron[outputLayerDimension, outputLayerDimension];
 

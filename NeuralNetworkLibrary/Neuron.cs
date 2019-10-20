@@ -12,13 +12,13 @@ namespace NeuralNetworkLibrary
         private List<double> weights;
         private Point coordinate;
         private int iteration;
-        private int wightsdimension;
+        private int weightsdimension;
         private int sigma0;
         private double alpha0 = 0.1;
         private double tau1;
         private int tau2 = 1000;
 
-        private double h(Point winnerCoordinate, Functions f)
+        private double h(Point winnerCoordinate,double countOfNeurons, Functions f)
         {
             double result = 0;
             double distance = 0;
@@ -46,7 +46,13 @@ namespace NeuralNetworkLibrary
                     }
                 case Functions.EuclideanMeasure:
                     {
+                        distance = Math.Sqrt(Math.Pow((winnerCoordinate.X - coordinate.X), 2) - Math.Pow((winnerCoordinate.Y - coordinate.Y), 2)); //Евклидова мера 
+                        for (int i = 0; i < countOfNeurons; i++)
+                        {
+                            result += distance;
+                        }
 
+                        return result;
                     }
                     break;
                     //case Functions.Gaus:
@@ -85,8 +91,7 @@ namespace NeuralNetworkLibrary
 
         private double Alpha(int t)
         {
-            double value = alpha0 * Math.Exp(-t / tau2);
-            return value;
+            return alpha0 * Math.Exp(-t / tau2);
         }
 
         private double Sigma(int t)
@@ -101,7 +106,7 @@ namespace NeuralNetworkLibrary
             set
             {
                 weights = value;
-                wightsdimension = weights.Capacity;
+                weightsdimension = weights.Capacity;
             }
         }
 
@@ -129,17 +134,25 @@ namespace NeuralNetworkLibrary
             InitializeVariables(sigma0);
         }
 
-        public double ModifyWeights(List<double> pattern, Point winnerCoordinate, int iteration, Functions f)
+        /// <summary>
+        /// Алгоритм WTA ? Модификация весов
+        /// </summary>
+        /// <param name="pattern"></param>
+        /// <param name="winnerCoordinate"></param>
+        /// <param name="iteration"></param>
+        /// <param name="f"></param>
+        /// <returns></returns>
+        public double ModifyWeights(List<double> pattern, Point winnerCoordinate, int iteration, Functions f,double countOfNeurons)
         {
             double avgDelta = 0;
             double modificationValue = 0;
-            for (int i = 0; i < wightsdimension; i++)
+            for (int i = 0; i < weightsdimension; i++)
             {
-                modificationValue = Alpha(iteration) * h(winnerCoordinate, f) * (pattern[i] - weights[i]);
+                modificationValue = Alpha(iteration) * h(winnerCoordinate, countOfNeurons,f) * (pattern[i] - weights[i]);
                 weights[i] += modificationValue;
                 avgDelta += modificationValue;
             }
-            avgDelta = avgDelta / wightsdimension;
+            avgDelta = avgDelta / weightsdimension;
             return avgDelta;
         }
 
@@ -152,7 +165,7 @@ namespace NeuralNetworkLibrary
                 {
                     norm += d;
                 }
-                norm = norm / this.wightsdimension;
+                norm = norm / this.weightsdimension;
                 return norm;
             }
         }

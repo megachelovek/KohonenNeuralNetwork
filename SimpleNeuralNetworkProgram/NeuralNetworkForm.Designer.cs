@@ -28,11 +28,12 @@
         /// </summary>
         private void InitializeComponent()
         {
-            System.Windows.Forms.DataVisualization.Charting.ChartArea chartArea5 = new System.Windows.Forms.DataVisualization.Charting.ChartArea();
-            System.Windows.Forms.DataVisualization.Charting.Series series5 = new System.Windows.Forms.DataVisualization.Charting.Series();
-            System.Windows.Forms.DataVisualization.Charting.ChartArea chartArea6 = new System.Windows.Forms.DataVisualization.Charting.ChartArea();
-            System.Windows.Forms.DataVisualization.Charting.Series series6 = new System.Windows.Forms.DataVisualization.Charting.Series();
+            System.Windows.Forms.DataVisualization.Charting.ChartArea chartArea1 = new System.Windows.Forms.DataVisualization.Charting.ChartArea();
+            System.Windows.Forms.DataVisualization.Charting.Series series1 = new System.Windows.Forms.DataVisualization.Charting.Series();
+            System.Windows.Forms.DataVisualization.Charting.ChartArea chartArea2 = new System.Windows.Forms.DataVisualization.Charting.ChartArea();
+            System.Windows.Forms.DataVisualization.Charting.Series series2 = new System.Windows.Forms.DataVisualization.Charting.Series();
             this.groupBox1 = new System.Windows.Forms.GroupBox();
+            this.isVisibleOutputVectors = new System.Windows.Forms.CheckBox();
             this.outputChart = new System.Windows.Forms.DataVisualization.Charting.Chart();
             this.inputChart = new System.Windows.Forms.DataVisualization.Charting.Chart();
             this.label2 = new System.Windows.Forms.Label();
@@ -48,7 +49,6 @@
             this.label5 = new System.Windows.Forms.Label();
             this.panelLegend = new System.Windows.Forms.Panel();
             this.neuralNetworkVisualizer = new SimpleNeuralNetworkProgram.NeuralNetworkVisualizer();
-            this.isVisibleOutputVectors = new System.Windows.Forms.CheckBox();
             this.groupBox1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.outputChart)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.inputChart)).BeginInit();
@@ -69,34 +69,44 @@
             this.groupBox1.TabStop = false;
             this.groupBox1.Text = "Графики нейронов и векторов";
             // 
+            // isVisibleOutputVectors
+            // 
+            this.isVisibleOutputVectors.AutoSize = true;
+            this.isVisibleOutputVectors.Location = new System.Drawing.Point(137, 371);
+            this.isVisibleOutputVectors.Name = "isVisibleOutputVectors";
+            this.isVisibleOutputVectors.Size = new System.Drawing.Size(217, 24);
+            this.isVisibleOutputVectors.TabIndex = 6;
+            this.isVisibleOutputVectors.Text = "Включить отображение";
+            this.isVisibleOutputVectors.UseVisualStyleBackColor = true;
+            // 
             // outputChart
             // 
-            chartArea5.Name = "ChartArea1";
-            this.outputChart.ChartAreas.Add(chartArea5);
+            chartArea1.Name = "ChartArea1";
+            this.outputChart.ChartAreas.Add(chartArea1);
             this.outputChart.ImeMode = System.Windows.Forms.ImeMode.KatakanaHalf;
             this.outputChart.IsSoftShadows = false;
             this.outputChart.Location = new System.Drawing.Point(10, 398);
             this.outputChart.Name = "outputChart";
             this.outputChart.Palette = System.Windows.Forms.DataVisualization.Charting.ChartColorPalette.SemiTransparent;
-            series5.ChartArea = "ChartArea1";
-            series5.Name = "Series1";
-            this.outputChart.Series.Add(series5);
+            series1.ChartArea = "ChartArea1";
+            series1.Name = "Series1";
+            this.outputChart.Series.Add(series1);
             this.outputChart.Size = new System.Drawing.Size(470, 300);
             this.outputChart.TabIndex = 5;
             this.outputChart.Text = "chart1";
             // 
             // inputChart
             // 
-            chartArea6.Name = "ChartArea1";
-            this.inputChart.ChartAreas.Add(chartArea6);
+            chartArea2.Name = "ChartArea1";
+            this.inputChart.ChartAreas.Add(chartArea2);
             this.inputChart.ImeMode = System.Windows.Forms.ImeMode.KatakanaHalf;
             this.inputChart.IsSoftShadows = false;
             this.inputChart.Location = new System.Drawing.Point(10, 60);
             this.inputChart.Name = "inputChart";
             this.inputChart.Palette = System.Windows.Forms.DataVisualization.Charting.ChartColorPalette.Excel;
-            series6.ChartArea = "ChartArea1";
-            series6.Name = "Series1";
-            this.inputChart.Series.Add(series6);
+            series2.ChartArea = "ChartArea1";
+            series2.Name = "Series1";
+            this.inputChart.Series.Add(series2);
             this.inputChart.Size = new System.Drawing.Size(470, 300);
             this.inputChart.TabIndex = 3;
             this.inputChart.Text = "chart1";
@@ -172,7 +182,7 @@
             this.textBoxEpsilon.Name = "textBoxEpsilon";
             this.textBoxEpsilon.Size = new System.Drawing.Size(290, 26);
             this.textBoxEpsilon.TabIndex = 3;
-            this.textBoxEpsilon.Text = "0,00001";
+            this.textBoxEpsilon.Text = "0,01";
             // 
             // label4
             // 
@@ -229,16 +239,6 @@
             this.neuralNetworkVisualizer.Size = new System.Drawing.Size(320, 260);
             this.neuralNetworkVisualizer.TabIndex = 4;
             this.neuralNetworkVisualizer.ZoomFactor = 25;
-            // 
-            // isVisibleOutputVectors
-            // 
-            this.isVisibleOutputVectors.AutoSize = true;
-            this.isVisibleOutputVectors.Location = new System.Drawing.Point(137, 371);
-            this.isVisibleOutputVectors.Name = "isVisibleOutputVectors";
-            this.isVisibleOutputVectors.Size = new System.Drawing.Size(217, 24);
-            this.isVisibleOutputVectors.TabIndex = 6;
-            this.isVisibleOutputVectors.Text = "Включить отображение";
-            this.isVisibleOutputVectors.UseVisualStyleBackColor = true;
             // 
             // NeuralNetworkForm
             // 

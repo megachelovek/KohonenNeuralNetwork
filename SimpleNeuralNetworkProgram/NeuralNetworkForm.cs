@@ -50,11 +50,6 @@ namespace SimpleNeuralNetworkProgram
             Application.DoEvents();
         }
 
-        //private void nn_EndIterationEvent(object sender, EventArgs e)
-        //{
-        //    if (pbStatus.Value < pbStatus.Maximum) pbStatus.Value++;
-        //}
-
         private void ListBoxSelectedIndexChanged(object sender, EventArgs e)
         {
             inputChart.Series["InputVectors"].Points.Clear();
@@ -96,12 +91,6 @@ namespace SimpleNeuralNetworkProgram
             }
         }
 
-        //private void lbVectors_Leave(object sender, EventArgs e)
-        //{
-        //    inputChart.Series["InputVectors"].Points.Clear();
-        //    outputChart.Series["OutputVectors"].Points.Clear();
-        //}
-
         private void AddPatternsToListBox()
         {
             lbVectors.Items.Clear();
@@ -125,7 +114,7 @@ namespace SimpleNeuralNetworkProgram
         private void loadVectorsStart_Click(object sender, EventArgs e)
         {
             int numberOfNeurons = (int)Math.Sqrt(Int32.Parse(textBoxCountOfNeurons.Text));
-            Functions f = Functions.Discrete;
+            Functions f = Functions.EuclideanMeasure;
 
             Double tbEpsilon2 = Double.Parse(textBoxEpsilon.Text.Replace('.', ','));
             nn = new NeuralNetwork(numberOfNeurons, 0, tbEpsilon2, f);

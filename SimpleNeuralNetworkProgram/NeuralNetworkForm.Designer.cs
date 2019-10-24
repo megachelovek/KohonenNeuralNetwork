@@ -81,6 +81,8 @@
             // 
             // outputChart
             // 
+            chartArea1.AxisX.LabelStyle.Format = "{0:0.000000}";
+            chartArea1.AxisY.LabelStyle.Format = "{0:0.0000}";
             chartArea1.Name = "ChartArea1";
             this.outputChart.ChartAreas.Add(chartArea1);
             this.outputChart.ImeMode = System.Windows.Forms.ImeMode.KatakanaHalf;
@@ -97,6 +99,7 @@
             // 
             // inputChart
             // 
+            chartArea2.AxisX.LabelStyle.Format = "{0:0.000000}";
             chartArea2.Name = "ChartArea1";
             this.inputChart.ChartAreas.Add(chartArea2);
             this.inputChart.ImeMode = System.Windows.Forms.ImeMode.KatakanaHalf;

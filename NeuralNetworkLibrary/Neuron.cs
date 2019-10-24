@@ -47,19 +47,16 @@ namespace NeuralNetworkLibrary
                 case Functions.EuclideanMeasure:
                     {
                         distance = Math.Sqrt(Math.Pow((winnerCoordinate.X - coordinate.X), 2) - Math.Pow((winnerCoordinate.Y - coordinate.Y), 2)); //Евклидова мера 
-                        
-
-                        //result *= 0.0001;
                         return distance;
                     }
                     break;
-                case Functions.Gaus:
-                    {
-                        distance = Math.Sqrt(Math.Pow((winnerCoordinate.X - coordinate.X), 2) + Math.Pow((winnerCoordinate.Y - coordinate.Y), 2));
-                        result = Math.Exp(-(distance * distance) / (Math.Pow(Sigma(iteration), 2)));
-                        return result;
-                        break;
-                    }
+                //case Functions.Gaus:
+                //    {
+                //        distance = Math.Sqrt(Math.Pow((winnerCoordinate.X - coordinate.X), 2) + Math.Pow((winnerCoordinate.Y - coordinate.Y), 2));
+                //        result = Math.Exp(-(distance * distance) / (Math.Pow(Sigma(iteration), 2)));
+                //        return result;
+                //        break;
+                //    }
                     //case Functions.MexicanHat:
                     //    {
                     //        distance = Math.Sqrt(Math.Pow((winnerCoordinate.X - coordinate.X), 2) + Math.Pow((winnerCoordinate.Y - coordinate.Y), 2));
@@ -88,7 +85,7 @@ namespace NeuralNetworkLibrary
             tau1 = 1000 / Math.Log(sigma0);
         }
 
-        private double Alpha(int t)
+        private double Nyu(int t)
         {
             return alpha0 * Math.Exp(-t / tau2);
         }
@@ -134,7 +131,7 @@ namespace NeuralNetworkLibrary
         }
 
         /// <summary>
-        /// Алгоритм WTA ? Модификация весов
+        /// Алгоритм WTA Модификация весов
         /// </summary>
         /// <param name="pattern"></param>
         /// <param name="winnerCoordinate"></param>
@@ -147,9 +144,9 @@ namespace NeuralNetworkLibrary
             double modificationValue = 0;
             for (int i = 0; i < weightsdimension; i++)
             {
-                modificationValue = Alpha(iteration) * h(winnerCoordinate, countOfNeurons,f) * (pattern[i] - weights[i]);
+                modificationValue = Nyu(iteration) * h(winnerCoordinate, countOfNeurons,f) * (pattern[i] - weights[i]);
                 weights[i] += modificationValue;
-                avgDelta += modificationValue;
+                avgDelta += modificationValue;// Здесь сумма всех весов
             }
             avgDelta = avgDelta / weightsdimension;
             return avgDelta;

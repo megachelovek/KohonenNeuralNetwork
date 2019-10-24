@@ -47,9 +47,8 @@ namespace SimpleNeuralNetworkProgram
                 for (int j = 0; j < nn.OutputLayerDimension; j++)
                 {
                         outputChart.Series["OutputVectors"].Points
-                        .AddXY((double.TryParse(nn.OutputLayer[i, j].Weights[0].ToString(),out double d)) ? d : 0, (double.TryParse(nn.OutputLayer[i, j].Weights[1].ToString(), out double f)) ? f : 0);
-                        //outputChart.Series["OutputVectors"].Points
-                        //    .AddXY(nn.OutputLayer[i, j].Weights[0], nn.OutputLayer[i, j].Weights[1]);
+                        .AddXY((double.TryParse(nn.OutputLayer[i, j].Weights[0].ToString(),out double d)) ? (double.IsNaN(nn.OutputLayer[i, j].Weights[0]))?0:d : 0, (double.TryParse(nn.OutputLayer[i, j].Weights[1].ToString(), out double f)) ? (double.IsNaN(nn.OutputLayer[i, j].Weights[1])) ? 0 : f : 0);
+
                     }
             }
             Application.DoEvents();
@@ -119,7 +118,7 @@ namespace SimpleNeuralNetworkProgram
         private void loadVectorsStart_Click(object sender, EventArgs e)
         {
             int numberOfNeurons = (int)Math.Sqrt(Int32.Parse(textBoxCountOfNeurons.Text));
-            Functions f = Functions.EuclideanMeasure;
+            Functions f = Functions.Discrete;
 
             Double tbEpsilon2 = Double.Parse(textBoxEpsilon.Text.Replace('.', ','));
             nn = new NeuralNetwork(numberOfNeurons, 0, tbEpsilon2, f);

@@ -10,6 +10,5 @@ namespace NeuralNetworkLibrary
     {
         Discrete,
         EuclideanMeasure,
-        Gaus
     }
 }

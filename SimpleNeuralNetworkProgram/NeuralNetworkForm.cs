@@ -47,11 +47,26 @@ namespace SimpleNeuralNetworkProgram
                 for (int j = 0; j < nn.OutputLayerDimension; j++)
                 {
                         outputChart.Series["OutputVectors"].Points
-                        .AddXY((double.TryParse(nn.OutputLayer[i, j].Weights[0].ToString(),out double d)) ? (double.IsNaN(nn.OutputLayer[i, j].Weights[0]))?0:d : 0, (double.TryParse(nn.OutputLayer[i, j].Weights[1].ToString(), out double f)) ? (double.IsNaN(nn.OutputLayer[i, j].Weights[1])) ? 0 : f : 0);
-
+                        .AddXY((object) ((double.TryParse(nn.OutputLayer[i, j].Weights[0].ToString(),out double d)) ? ValidateDataForChart(d) : 0),
+                                        ((double.TryParse(nn.OutputLayer[i, j].Weights[1].ToString(),out double f)) ? ValidateDataForChart(f) : 0));
+                        //.AddXY((object)((double.TryParse(nn.OutputLayer[i, j].Weights[0].ToString(), out double d)) ? (double.IsNaN(nn.OutputLayer[i, j].Weights[0])) ? 0 : (nn.OutputLayer[i, j].Weights[0] < Double.MinValue) ? Double.MinValue : d : 0),
+                        //    ((double.TryParse(nn.OutputLayer[i, j].Weights[1].ToString(), out double f)) ? (double.IsNaN(nn.OutputLayer[i, j].Weights[1])) ? 0 : (nn.OutputLayer[i, j].Weights[0] < Double.MinValue) ? Double.MinValue : f : 0));
                     }
             }
             Application.DoEvents();
+        }
+
+        private double ValidateDataForChart(double number)
+        {
+            if (!double.IsNaN(number)) 
+            {
+                if (number < 0.000000000000000001E+10)
+                {
+                    return 0.000000000000000001E+10;
+                }
+            }
+
+            return 0;
         }
 
         private void ListBoxSelectedIndexChanged(object sender, EventArgs e)
@@ -121,9 +136,13 @@ namespace SimpleNeuralNetworkProgram
             Functions f = Functions.Discrete;
 
             Double tbEpsilon2 = Double.Parse(textBoxEpsilon.Text.Replace('.', ','));
-            nn = new NeuralNetwork(numberOfNeurons, 0, tbEpsilon2, f);
-            nn.EndEpochEvent += new EndEpochEventHandler(EndEpochEvent);
-            nn.Normalize = this.checkBoxNormalize.Checked;
+            if (nn == null)
+            {
+                nn = new NeuralNetwork(numberOfNeurons, 0, tbEpsilon2, f);
+                nn.EndEpochEvent += new EndEpochEventHandler(EndEpochEvent);
+                nn.Normalize = this.checkBoxNormalize.Checked;
+            }
+
             OpenFileDialog ofd = new OpenFileDialog();
             if (ofd.ShowDialog() == DialogResult.OK)
             {

@@ -32,7 +32,7 @@ namespace NeuralNetworkLibrary
         private int currentIteration;
 
         private Functions function;
-        private double epsilon;
+        private double valueSKO;
         private double currentSKO;
         
         //(3) этап Евклидова мера
@@ -68,17 +68,19 @@ namespace NeuralNetworkLibrary
             Neuron Winner = this.FindWinner(pattern);
             currentSKO = 0;
             for (int i = 0; i < outputLayerDimension; i++)
-                for (int j = 0; j < outputLayerDimension; j++)
-                {
-                    currentSKO += outputLayer[i, j].ModifyWeights(pattern, Winner.Coordinate, currentIteration, function, Math.Pow(outputLayerDimension,2));
-                }
+            for (int j = 0; j < outputLayerDimension; j++)
+            {
+                currentSKO += outputLayer[i, j].ModifyWeights(pattern, Winner.Coordinate, currentIteration, function, outputLayerDimension* outputLayerDimension);
+            }
             currentIteration++;
-            //currentSKO = Math.Abs(currentSKO / (outputLayerDimension * outputLayerDimension));
-            currentSKO = Math.Sqrt(1.0/(Math.Pow(outputLayerDimension,2)-1)) *  Math.Abs(currentSKO / (outputLayerDimension * outputLayerDimension)));
+            currentSKO = Math.Abs(currentSKO / (outputLayerDimension * outputLayerDimension));// Деление в СКО
+
+            //currentSKO = Math.Sqrt(1.0 / (Math.Pow(outputLayerDimension, 2) - 1)) * Math.Pow(currentSKO,2);
             EndEpochEventArgs e = new EndEpochEventArgs();
             OnEndEpochEvent(e);
         }
 
+        #region MyRegion Второстепенные функции
         public bool Normalize
         {
             get { return normalize; }
@@ -184,87 +186,6 @@ namespace NeuralNetworkLibrary
             return colorMatrix;
         }
 
-        public NeuralNetwork(int sqrtOfCountNeurons, int numberOfIterations, double epsilon, Functions f)
-        {
-            outputLayerDimension = sqrtOfCountNeurons;
-            currentIteration = 1;
-            this.numberOfIterations = numberOfIterations;
-            function = f;
-            this.epsilon = epsilon;
-            currentSKO = 100;
-        }
-
-        /// <summary>
-        /// (3 и 4) Поиск минимума, основная функция
-        /// </summary>
-        /// <param name="pattern"></param>
-        /// <returns></returns>
-        public Neuron FindWinner(List<double> pattern)
-        {
-            List<double> norms = new List<double>(outputLayerDimension * outputLayerDimension);
-            double D = 0;
-            Neuron Winner = outputLayer[0, 0];
-            double min = EuclideanCalculateVectors(pattern, outputLayer[0, 0].Weights);
-            for (int i = 0; i < outputLayerDimension; i++)
-                for (int j = 0; j < outputLayerDimension; j++)
-                {
-                    D = EuclideanCalculateVectors(pattern, outputLayer[i, j].Weights);
-                    if (D < min)
-                    {
-                        min = D;
-                        Winner = outputLayer[i, j];
-                    }
-                }
-            return Winner;
-        }
-
-        public void StartLearning()
-        {
-            int iterations = 0;
-            if (numberOfIterations == 0)
-            {
-                while (currentSKO > epsilon) //Пока епсилон не станет меньше значения
-                {
-                    List<List<double>> patternsToLearn = new List<List<double>>(numberOfPatterns);
-                    foreach (List<double> pArray in patterns)
-                        patternsToLearn.Add(pArray);
-                    Random randomPattern = new Random();
-                    List<double> pattern = new List<double>(inputLayerDimension);
-                    for (int i = 0; i < numberOfPatterns; i++)
-                    {
-                        pattern = patternsToLearn[randomPattern.Next(numberOfPatterns - i)];
-
-                        StartEpoch(pattern);
-
-                        patternsToLearn.Remove(pattern);
-                    }
-                    iterations++;
-                    OnEndIterationEvent(new EventArgs());
-                }
-            }
-            //Этот вариант не используется
-            //else
-            //{
-            //    while (iterations <= numberOfIterations && currentSKO > epsilon)
-            //    {
-            //        List<List<double>> patternsToLearn = new List<List<double>>(numberOfPatterns);
-            //        foreach (List<double> pArray in patterns)
-            //            patternsToLearn.Add(pArray);
-            //        Random randomPattern = new Random();
-            //        List<double> pattern = new List<double>(inputLayerDimension);
-            //        for (int i = 0; i < numberOfPatterns; i++)
-            //        {
-            //            pattern = patternsToLearn[randomPattern.Next(numberOfPatterns - i)];
-
-            //            StartEpoch(pattern);
-
-            //            patternsToLearn.Remove(pattern);
-            //        }
-            //        iterations++;
-            //        OnEndIterationEvent(new EventArgs());
-            //    }
-            //}
-        }
 
         /// <summary>
         /// Берет данные из файла и приводит к нужному формату с которого можно считать
@@ -281,22 +202,24 @@ namespace NeuralNetworkLibrary
             }
 
             inputLayerDimension = k;
-            int sigma0 = outputLayerDimension; 
+            int sigma0 = outputLayerDimension;
+            if (outputLayer == null)
+            {
+                outputLayer = new Neuron[outputLayerDimension, outputLayerDimension];
 
-            outputLayer = new Neuron[outputLayerDimension, outputLayerDimension];
-
-            // (2) Этап Заполнение случайными весами 
-            Random r = new Random();
-            for (int i = 0; i < outputLayerDimension; i++)
-                for (int j = 0; j < outputLayerDimension; j++)
-                {
-                    outputLayer[i, j] = new Neuron(i, j, sigma0);
-                    outputLayer[i, j].Weights = new List<double>(inputLayerDimension);
-                    for (k = 0; k < inputLayerDimension; k++)
+                // (2) Этап Заполнение случайными весами 
+                Random r = new Random();
+                for (int i = 0; i < outputLayerDimension; i++)
+                    for (int j = 0; j < outputLayerDimension; j++)
                     {
-                        outputLayer[i, j].Weights.Add(r.NextDouble());
+                        outputLayer[i, j] = new Neuron(i, j, sigma0);
+                        outputLayer[i, j].Weights = new List<double>(inputLayerDimension);
+                        for (k = 0; k < inputLayerDimension; k++)
+                        {
+                            outputLayer[i, j].Weights.Add(r.NextDouble());
+                        }
                     }
-                }
+            }
 
             k = 0;
             while (line != null)
@@ -339,6 +262,7 @@ namespace NeuralNetworkLibrary
                     line = sr.ReadLine();
                 }
             }
+            sr.Close();
         }
 
         public event EndEpochEventHandler EndEpochEvent;
@@ -355,5 +279,91 @@ namespace NeuralNetworkLibrary
             if (EndIterationEvent != null)
                 EndIterationEvent(this, e);
         }
+
+        #endregion
+
+
+        public NeuralNetwork(int sqrtOfCountNeurons, int numberOfIterations, double valueSko, Functions f)
+        {
+            outputLayerDimension = sqrtOfCountNeurons;
+            currentIteration = 1;
+            this.numberOfIterations = numberOfIterations;
+            function = f;
+            this.valueSKO = valueSko;
+            currentSKO = 100;
+        }
+
+        /// <summary>
+        /// (3 и 4) Поиск минимума, основная функция
+        /// </summary>
+        /// <param name="pattern"></param>
+        /// <returns></returns>
+        public Neuron FindWinner(List<double> pattern)
+        {
+            List<double> norms = new List<double>(outputLayerDimension * outputLayerDimension);
+            double D = 0;
+            Neuron Winner = outputLayer[0, 0];
+            double min = EuclideanCalculateVectors(pattern, outputLayer[0, 0].Weights);
+            for (int i = 0; i < outputLayerDimension; i++)
+                for (int j = 0; j < outputLayerDimension; j++)
+                {
+                    D = EuclideanCalculateVectors(pattern, outputLayer[i, j].Weights);
+                    if (D < min)
+                    {
+                        min = D;
+                        Winner = outputLayer[i, j];
+                    }
+                }
+            return Winner;
+        }
+
+        public void StartLearning()
+        {
+            int iterations = 0;
+            if (numberOfIterations == 0)
+            {
+                while (currentSKO > valueSKO) //Пока  не станет меньше значения
+                {
+                    List<List<double>> patternsToLearn = new List<List<double>>(numberOfPatterns);
+                    foreach (List<double> pArray in patterns)
+                        patternsToLearn.Add(pArray);
+                    Random randomPattern = new Random();
+                    List<double> pattern = new List<double>(inputLayerDimension);
+                    for (int i = 0; i < numberOfPatterns; i++)
+                    {
+                        pattern = patternsToLearn[randomPattern.Next(numberOfPatterns - i)];
+
+                        StartEpoch(pattern);
+
+                        patternsToLearn.Remove(pattern);
+                    }
+                    iterations++;
+                    OnEndIterationEvent(new EventArgs());
+                }
+            }
+            //Этот вариант не используется
+            //else
+            //{
+            //    while (iterations <= numberOfIterations && currentSKO > valueSKO)
+            //    {
+            //        List<List<double>> patternsToLearn = new List<List<double>>(numberOfPatterns);
+            //        foreach (List<double> pArray in patterns)
+            //            patternsToLearn.Add(pArray);
+            //        Random randomPattern = new Random();
+            //        List<double> pattern = new List<double>(inputLayerDimension);
+            //        for (int i = 0; i < numberOfPatterns; i++)
+            //        {
+            //            pattern = patternsToLearn[randomPattern.Next(numberOfPatterns - i)];
+
+            //            StartEpoch(pattern);
+
+            //            patternsToLearn.Remove(pattern);
+            //        }
+            //        iterations++;
+            //        OnEndIterationEvent(new EventArgs());
+            //    }
+            //}
+        }
+
     }
 }

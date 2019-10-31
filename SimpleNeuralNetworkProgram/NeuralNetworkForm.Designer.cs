@@ -185,16 +185,16 @@
             this.textBoxEpsilon.Name = "textBoxEpsilon";
             this.textBoxEpsilon.Size = new System.Drawing.Size(290, 26);
             this.textBoxEpsilon.TabIndex = 3;
-            this.textBoxEpsilon.Text = "0,01";
+            this.textBoxEpsilon.Text = "0,008";
             // 
             // label4
             // 
             this.label4.AutoSize = true;
             this.label4.Location = new System.Drawing.Point(6, 82);
             this.label4.Name = "label4";
-            this.label4.Size = new System.Drawing.Size(178, 20);
+            this.label4.Size = new System.Drawing.Size(145, 20);
             this.label4.TabIndex = 2;
-            this.label4.Text = "Точность до, Эпсилон";
+            this.label4.Text = "Точность до, СКО";
             // 
             // textBoxCountOfNeurons
             // 
@@ -202,7 +202,7 @@
             this.textBoxCountOfNeurons.Name = "textBoxCountOfNeurons";
             this.textBoxCountOfNeurons.Size = new System.Drawing.Size(290, 26);
             this.textBoxCountOfNeurons.TabIndex = 1;
-            this.textBoxCountOfNeurons.Text = "36";
+            this.textBoxCountOfNeurons.Text = "12";
             // 
             // label3
             // 

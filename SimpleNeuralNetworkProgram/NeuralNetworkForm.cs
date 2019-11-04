@@ -51,7 +51,7 @@ namespace SimpleNeuralNetworkProgram
                                         ((double.TryParse(nn.OutputLayer[i, j].Weights[1].ToString(),out double f)) ? ValidateDataForChart(f) : 0));
                         //.AddXY((object)((double.TryParse(nn.OutputLayer[i, j].Weights[0].ToString(), out double d)) ? (double.IsNaN(nn.OutputLayer[i, j].Weights[0])) ? 0 : (nn.OutputLayer[i, j].Weights[0] < Double.MinValue) ? Double.MinValue : d : 0),
                         //    ((double.TryParse(nn.OutputLayer[i, j].Weights[1].ToString(), out double f)) ? (double.IsNaN(nn.OutputLayer[i, j].Weights[1])) ? 0 : (nn.OutputLayer[i, j].Weights[0] < Double.MinValue) ? Double.MinValue : f : 0));
-                    }
+                }
             }
             Application.DoEvents();
         }
@@ -89,25 +89,47 @@ namespace SimpleNeuralNetworkProgram
             label.Text = "Legend";
             label.AutoSize = true;
             panelLegend.Controls.Add(label);
-            for (int i = 0; i < nn.ExistentClasses.Count; i++)
+            int i=0,ii = 0;
+            foreach (var legendaColor in nn.LegendaColors)
             {
                 Label lbl = new Label();
-                lbl.Name = "lbl" + nn.ExistentClasses.Keys[i];
-                lbl.Text = " - " + nn.ExistentClasses.Keys[i];
-                lbl.Top = 20 * (i + 1);
+                lbl.Name = "lbl" + legendaColor.Value;
+                lbl.Text = " - " + legendaColor.Value;
+                lbl.Top = 20 * (i + 1); 
                 lbl.AutoSize = true;
                 lbl.Left = 15 + (int)lbl.Font.Size;
                 this.panelLegend.Controls.Add(lbl);
+                i++;
 
                 Panel panel = new Panel();
-                panel.Name = "panel" + nn.ExistentClasses.Keys[i];
-                panel.Top = 20 * (i + 1) + (int)lbl.Font.Size / 2;
+                panel.Name = "panel" + legendaColor.Value;
+                panel.Top = 20 * (ii + 1) + (int)lbl.Font.Size / 2;
                 panel.Left = 15;
                 panel.Width = (int)lbl.Font.Size;
                 panel.Height = (int)lbl.Font.Size;
-                panel.BackColor = nn.UsedColors[i];
+                panel.BackColor = legendaColor.Key;
                 this.panelLegend.Controls.Add(panel);
+                ii++;
             }
+            //for (int i = 0; i < nn.LegendaColors.Count; i++)
+            //{
+            //    Label lbl = new Label();
+            //    lbl.Name = "lbl" + nn.ExistentClasses.Keys[i];
+            //    lbl.Text = " - " + nn.LegendaColors.ElementAt(i).Value;
+            //    lbl.Top = 20 * (i + 1);
+            //    lbl.AutoSize = true;
+            //    lbl.Left = 15 + (int)lbl.Font.Size;
+            //    this.panelLegend.Controls.Add(lbl);
+
+            //    Panel panel = new Panel();
+            //    panel.Name = "panel" + nn.ExistentClasses.Keys[i];
+            //    panel.Top = 20 * (i + 1) + (int)lbl.Font.Size / 2;
+            //    panel.Left = 15;
+            //    panel.Width = (int)lbl.Font.Size;
+            //    panel.Height = (int)lbl.Font.Size;
+            //    panel.BackColor = nn.LegendaColors.Keys.ElementAt(i);
+            //    this.panelLegend.Controls.Add(panel);
+            //}
         }
 
         private void AddPatternsToListBox()
@@ -129,7 +151,37 @@ namespace SimpleNeuralNetworkProgram
             inputParams.Enabled = switcher;
             lbVectors.Enabled = switcher;
         }
+
+        private void CheckSuccessPercentage()
+        {
+            int success = 0;
+            int fail = 0;
+            for (int i = 0; i < nn.Patterns.Count; i++)
+            {
+                Neuron Winner = nn.FindWinner(nn.Patterns[i]);
+                //int indexColor = nn.LegendaColors..IndexOf(nn.ColorMatrixNn[Winner.Coordinate.X, Winner.Coordinate.Y]);
+                //if (nn.Classes[i] == Winner.GetMaxSimilarClass())
+                //if (nn.Classes[i] == nn.OutputLayer[Winner.Coordinate.X, Winner.Coordinate.Y].ClassAfterLearning)
+                if (nn.LegendaColors.FirstOrDefault(x => x.Value == nn.Classes[i]).Key == nn.ColorMatrixNn[Winner.Coordinate.X, Winner.Coordinate.Y])
+                {
+                    success++;
+                }
+                else
+                {
+                    fail++;
+                }
+
+                lbVectors.Items.Cast<string>();
+                string itemText = lbVectors.Items[i].ToString();
+                lbVectors.Items.RemoveAt(i);
+                //lbVectors.Items.Insert(i, itemText+$"[{nn.ExistentClasses.Keys[indexColor]}]");
+                lbVectors.Items.Insert(i, itemText + $"[{nn.LegendaColors[nn.ColorMatrixNn[Winner.Coordinate.X, Winner.Coordinate.Y]]}]");
+                this.successLabel.Text = $"Успешно={success}/{nn.Patterns.Count}";
+            }
+        }
         
+
+
         private void loadVectorsStart_Click(object sender, EventArgs e)
         {
             int numberOfNeurons = (int)Math.Sqrt(Int32.Parse(textBoxCountOfNeurons.Text));
@@ -158,6 +210,7 @@ namespace SimpleNeuralNetworkProgram
                 panelLegend.Visible = true;
                 AddLegend();
                 SwitchControls(true);
+                CheckSuccessPercentage();
             }
         }
     }

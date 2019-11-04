@@ -2,8 +2,6 @@
 using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace NeuralNetworkLibrary
 {
@@ -18,6 +16,8 @@ namespace NeuralNetworkLibrary
         private double tau1;
         private int tau2 = 1000;
         private double Nyu =0.5;
+        public string ClassAfterLearning;
+        private Dictionary<string, int> similarityClassForLearning;
 
         /// <summary>
         /// Алгоритм WTA Модификация весов + Возвращение текущего СКО
@@ -33,7 +33,8 @@ namespace NeuralNetworkLibrary
             double modificationValue = 0;
             for (int i = 0; i < weightsdimension; i++)
             {
-                modificationValue = Nyu * (pattern[i] - weights[i]) + weights[i];//* h(winnerCoordinate, countOfNeurons,f) * (pattern[i] - weights[i]);
+                modificationValue = Alpha(iteration) * h(winnerCoordinate, f) * (pattern[i] - weights[i]);
+                //modificationValue = Nyu * (pattern[i] - weights[i]) + weights[i];//* h(winnerCoordinate, countOfNeurons,f) * (pattern[i] - weights[i]);
                 weights[i] += modificationValue;
                 avgDelta += modificationValue;// Здесь сумма всех весов
             }
@@ -53,6 +54,31 @@ namespace NeuralNetworkLibrary
                 norm = norm / this.weightsdimension;
                 return norm;
             }
+        }
+
+        //СПОРНАЯ ШТУКА, ЛУЧШЕ ПОКА НЕ ИСПОЛЬЗОВАТЬ
+        public void UpdateSimilarMap(string nameClass,Dictionary<string,int> currentClasses)
+        {
+            //Dictionary<string, int> sortedDict = currentClasses.OrderByDescending(pair => pair.Value)
+            //    .Take(currentClasses.Count).ToDictionary(pair => pair.Key, pair => pair.Value);
+            //int index = Array.IndexOf(sortedDict.Keys.ToArray(), nameClass)-1;
+            //double differenceBetweenClasses = (Math.Round((double)sortedDict.Values.Max() / currentClasses[nameClass])/5)-3;
+            if (!similarityClassForLearning.ContainsKey(nameClass))
+            {
+                similarityClassForLearning.Add(nameClass,1);
+            }
+            else
+            {
+                //similarityClassForLearning[nameClass]*=(differenceBetweenClasses!=0)?differenceBetweenClasses:1;
+                //similarityClassForLearning[nameClass] *= ( differenceBetweenClasses>0) ? (int)differenceBetweenClasses : 1;
+                similarityClassForLearning[nameClass] ++;
+            }
+        }
+
+        //СПОРНАЯ ШТУКА, ЛУЧШЕ ПОКА НЕ ИСПОЛЬЗОВАТЬ
+        public string GetMaxSimilarClass()
+        {
+            return (similarityClassForLearning.Aggregate((x, y) => x.Value > y.Value ? x : y).Key) ?? null; 
         }
 
         #region Второстепенные функции
@@ -100,6 +126,7 @@ namespace NeuralNetworkLibrary
             coordinate.X = x;
             coordinate.Y = y;
             InitializeVariables(sigma0);
+            similarityClassForLearning = new Dictionary<string, int>();
         }
 
         public Neuron(Point coordinate, int sigma0)
@@ -108,41 +135,51 @@ namespace NeuralNetworkLibrary
             InitializeVariables(sigma0);
         }
 
-        //private double h(Point winnerCoordinate,double countOfNeurons, Functions f)
-        //{
-        //    double result = 0;
-        //    double distance = 0;
-        //    switch (f)
-        //    {
-        //        case Functions.Discrete:
-        //            {
-        //                distance = Math.Abs(this.Coordinate.X - winnerCoordinate.X) + Math.Abs(this.Coordinate.Y - winnerCoordinate.Y);
-        //                switch ((int)distance)
-        //                {
-        //                    case 0:
-        //                        result = 1;
-        //                        break;
-        //                    case 1:
-        //                        result = 0.5f;
-        //                        break;
-        //                    case 2:
-        //                        result = 0.25f;
-        //                        break;
-        //                    case 3:
-        //                        result = 0.125f;
-        //                        break;
-        //                }
-        //                break;
-        //            }
-        //        case Functions.EuclideanMeasure:
-        //            {
-        //                distance = Math.Sqrt(Math.Pow((winnerCoordinate.X - coordinate.X), 2) - Math.Pow((winnerCoordinate.Y - coordinate.Y), 2)); //Евклидова мера 
-        //                return distance;
-        //            }
-        //            break;
-        //    }
-        //    return result;
-        //}
+        private double Alpha(int t)
+        {
+            double value = alpha0 * Math.Exp(-t / tau2);
+            return value;
+        }
+
+        private double h(Point winnerCoordinate, Functions f)
+        {
+            double result = 0;
+            double distance = 0;
+            switch (f)
+            {
+                case Functions.Discrete:
+                    {
+                        distance = Math.Abs(this.Coordinate.X - winnerCoordinate.X) + Math.Abs(this.Coordinate.Y - winnerCoordinate.Y);
+                        switch ((int)distance)
+                        {
+                            case 0:
+                                result = 1;
+                                break;
+                            case 1:
+                                result = 0.5f;
+                                break;
+                            case 2:
+                                result = 0.25f;
+                                break;
+                            case 3:
+                                result = 0.125f;
+                                break;
+                        }
+                        break;
+                    }
+                case Functions.EuclideanMeasure:
+                    {
+                        distance = Math.Sqrt(Math.Pow((winnerCoordinate.X - coordinate.X), 2) + Math.Pow((winnerCoordinate.Y - coordinate.Y), 2));
+                        result = Math.Exp(-(distance * distance) / (Math.Pow(NyuFormula(iteration), 2)));
+
+                            //distance = Math.Sqrt(Math.Pow((winnerCoordinate.X - coordinate.X), 2) - Math.Pow((winnerCoordinate.Y - coordinate.Y), 2)); //Евклидова мера 
+                        return result;
+                    }
+                    break;
+            }
+            return result;
+        }
+
         #endregion
     }
 }

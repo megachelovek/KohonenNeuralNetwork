@@ -3,187 +3,154 @@ using System.Collections.Generic;
 using System.Drawing;
 using System.IO;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace NeuralNetworkLibrary
 {
     public delegate void EndEpochEventHandler(object sender, EndEpochEventArgs e);
+
     public delegate void EndIterationEventHandler(object sender, EventArgs e);
 
     public class NeuralNetwork
     {
-        private Neuron[,] outputLayer;
+        private int currentIteration;
 
-        public Neuron[,] OutputLayer
-        {
-            get { return outputLayer; }
-            set { outputLayer = value; }
-        }
+        private Dictionary<string, int> currentRatingClasses;
+        private readonly Functions function;
 
         private bool isLearning = true;
-        private int inputLayerDimension; // Размерность входного слоя
-        private int outputLayerDimension; // Размерность выходного слоя
-        private int numberOfPatterns;
-        private List<List<double>> patterns; //Вектора 
-        private List<string> classes;
-        private SortedList<string, int> existentClasses;
-        //private List<System.Drawing.Color> usedColors;
-        private bool normalize;
-        private int numberOfIterations;
-        private int currentIteration;
-        public Color[,] ColorMatrixNn { get; private set; }
-        public Dictionary<Color,string> LegendaColors;
-        private Functions function;
-        private double valueSKO;
-        private double currentSKO;
 
-        private Dictionary<string,int> currentRatingClasses;
+        public Dictionary<Color, string> LegendaColors;
+
+        //private List<System.Drawing.Color> usedColors;
+        private readonly int numberOfIterations;
+        private int numberOfPatterns;
+        private readonly double valueSKO;
+
+        public NeuralNetwork(int sqrtOfCountNeurons, int numberOfIterations, double valueSko, Functions f)
+        {
+            OutputLayerDimension = sqrtOfCountNeurons;
+            currentIteration = 1;
+            this.numberOfIterations = numberOfIterations;
+            function = f;
+            valueSKO = valueSko;
+            CurrentDelta = 100;
+        }
+
+        public Neuron[,] OutputLayer { get; set; }
+
+        public Color[,] ColorMatrixNn { get; private set; }
 
         //(3) этап Евклидова мера
         private double EuclideanCalculateVectors(List<double> Xi, List<double> Wi)
         {
             double value = 0;
-            for (int i = 0; i < Xi.Count; i++)
-                value += Math.Pow((Xi[i] - Wi[i]), 2);
+            for (var i = 0; i < Xi.Count; i++)
+                value += Math.Pow(Xi[i] - Wi[i], 2);
             value = Math.Sqrt(value);
             return value;
         }
 
         /// <summary>
-        /// Нормализация, как раз Xj = Xj / (Math.sqrt ( Math.Sum(Xj^2)))
+        ///     Нормализация, как раз Xj = Xj / (Math.sqrt ( Math.Sum(Xj^2)))
         /// </summary>
         /// <param name="pattern"></param>
         private void NormalizeInputPattern(List<double> pattern)
         {
             double nn = 0;
-            for (int i = 0; i < inputLayerDimension; i++)
-            {
-                nn += (pattern[i] * pattern[i]);
-            }
+            for (var i = 0; i < InputLayerDimension; i++) nn += pattern[i] * pattern[i];
             nn = Math.Sqrt(nn);
-            for (int i = 0; i < inputLayerDimension; i++)
-            {
-                pattern[i] /= nn;
-            }
-        }
-
-        private void StartEpoch(List<double> pattern,int iteration)
-        {
-            Neuron Winner = this.FindWinner(pattern);
-            //Winner.UpdateSimilarMap(classes[iteration], currentRatingClasses);
-            //currentRatingClasses[classes[iteration]]++;
-            //Winner.ClassAfterLearning = Winner.GetMaxSimilarClass();
-            currentSKO = 0;
-            for (int i = 0; i < outputLayerDimension; i++)
-                for (int j = 0; j < outputLayerDimension; j++)
-                {
-                    currentSKO += outputLayer[i, j].ModifyWeights(pattern, Winner.Coordinate, currentIteration, function, outputLayerDimension* outputLayerDimension);
-                }
-            currentIteration++;
-            //currentSKO = Math.Abs(currentSKO / (outputLayerDimension * outputLayerDimension));// Деление в СКО
-            currentSKO = Math.Abs(currentSKO / (outputLayerDimension * outputLayerDimension));
-            //currentSKO = Math.Sqrt(1.0 / (Math.Pow(outputLayerDimension, 2) - 1)) * Math.Pow(currentSKO,2);
-            EndEpochEventArgs e = new EndEpochEventArgs();
-            OnEndEpochEvent(e);
-        }
-
-        public NeuralNetwork(int sqrtOfCountNeurons, int numberOfIterations, double valueSko, Functions f)
-        {
-            outputLayerDimension = sqrtOfCountNeurons;
-            currentIteration = 1;
-            this.numberOfIterations = numberOfIterations;
-            function = f;
-            this.valueSKO = valueSko;
-            currentSKO = 100;
-           
+            for (var i = 0; i < InputLayerDimension; i++) pattern[i] /= nn;
         }
 
         /// <summary>
-        /// (3 и 4) Поиск минимума, основная функция
+        ///     1 эпоха = однократная подача всех обучающих примеров
+        ///     Этапы 4 и 5 67
+        /// </summary>
+        /// <param name="pattern"></param>
+        /// <param name="iteration"></param>
+        private void StartEpoch(List<double> pattern, int iteration)
+        {
+            var Winner = FindWinner(pattern);
+            //Winner.UpdateSimilarMap(classes[iteration], currentRatingClasses);
+            //currentRatingClasses[classes[iteration]]++;
+            //Winner.ClassAfterLearning = Winner.GetMaxSimilarClass();
+            CurrentDelta = 0;
+            for (var i = 0; i < OutputLayerDimension; i++)
+            for (var j = 0; j < OutputLayerDimension; j++)
+                CurrentDelta += OutputLayer[i, j].ModifyWeights(pattern, Winner.Coordinate, currentIteration, function,
+                    OutputLayerDimension * OutputLayerDimension);
+            currentIteration++;
+            //currentSKO = Math.Abs(currentSKO / (outputLayerDimension * outputLayerDimension));// Деление в СКО
+            CurrentDelta = Math.Abs(CurrentDelta / (OutputLayerDimension * OutputLayerDimension));
+            //currentSKO = Math.Sqrt(1.0 / (Math.Pow(outputLayerDimension, 2) - 1)) * Math.Pow(currentSKO,2);
+            var e = new EndEpochEventArgs();
+            OnEndEpochEvent(e);
+        }
+
+        /// <summary>
+        ///     (3 и 4) Поиск минимума, основная функция
         /// </summary>
         /// <param name="pattern"></param>
         /// <returns></returns>
         public Neuron FindWinner(List<double> pattern)
         {
             double D = 0;
-            Neuron Winner = outputLayer[0, 0];
-            double min = EuclideanCalculateVectors(pattern, outputLayer[0, 0].Weights);
-            for (int i = 0; i < outputLayerDimension; i++)
-                for (int j = 0; j < outputLayerDimension; j++)
+            var Winner = OutputLayer[0, 0];
+            var min = EuclideanCalculateVectors(pattern, OutputLayer[0, 0].Weights);
+            for (var i = 0; i < OutputLayerDimension; i++)
+            for (var j = 0; j < OutputLayerDimension; j++)
+            {
+                D = EuclideanCalculateVectors(pattern, OutputLayer[i, j].Weights);
+                if (D < min)
                 {
-                    D = EuclideanCalculateVectors(pattern, outputLayer[i, j].Weights);
-                    if (D < min)
-                    {
-                        min = D;
-                        Winner = outputLayer[i, j];
-                    }
+                    min = D;
+                    Winner = OutputLayer[i, j];
                 }
+            }
+
             return Winner;
         }
 
         public void StartLearning()
         {
-            int iterations = 0;
+            var iterations = 0;
             if (numberOfIterations == 0)
-            {
-                while (currentSKO > valueSKO) //Пока  не станет меньше значения
+                while (CurrentDelta > valueSKO) //Пока не станет меньше значения
                 {
-                    List<List<double>> patternsToLearn = new List<List<double>>(numberOfPatterns);
-                    foreach (List<double> pArray in patterns)
+                    var patternsToLearn = new List<List<double>>(numberOfPatterns);
+                    foreach (var pArray in Patterns)
                         patternsToLearn.Add(pArray);
-                    Random randomPattern = new Random();
-                    List<double> pattern = new List<double>(inputLayerDimension);
-                    for (int i = 0; i < numberOfPatterns; i++)
+                    var randomPattern = new Random();
+                    var pattern = new List<double>(InputLayerDimension);
+                    for (var i = 0; i < numberOfPatterns; i++)
                     {
                         pattern = patternsToLearn[randomPattern.Next(numberOfPatterns - i)];
 
-                        StartEpoch(pattern,i);
+                        StartEpoch(pattern, i);
 
                         patternsToLearn.Remove(pattern);
                     }
+
                     iterations++;
                     OnEndIterationEvent(new EventArgs());
                 }
-            }
         }
 
         #region MyRegion Второстепенные функции
-        public bool Normalize
-        {
-            get { return normalize; }
-            set { normalize = value; }
-        }
 
-        public List<List<double>> Patterns
-        {
-            get { return patterns; }
-        }
+        public bool Normalize { get; set; }
 
-        public List<string> Classes
-        {
-            get { return classes; }
-        }
+        public List<List<double>> Patterns { get; private set; }
 
-        public int InputLayerDimension
-        {
-            get { return inputLayerDimension; }
-        }
+        public List<string> Classes { get; private set; }
 
-        public int OutputLayerDimension
-        {
-            get { return outputLayerDimension; }
-        }
+        public int InputLayerDimension { get; private set; }
 
-        public double CurrentDelta
-        {
-            get { return currentSKO; }
-        }
+        public int OutputLayerDimension { get; }
 
-        public SortedList<string, int> ExistentClasses
-        {
-            get { return existentClasses; }
-        }
+        public double CurrentDelta { get; private set; }
+
+        public SortedList<string, int> ExistentClasses { get; private set; }
 
         //public List<System.Drawing.Color> UsedColors
         //{
@@ -192,63 +159,60 @@ namespace NeuralNetworkLibrary
 
         private int NumberOfClasses()
         {
-            existentClasses = new SortedList<string, int>();
-            existentClasses.Add(classes[0], 1);
-            int k = 0;
-            int d = 2;
-            for (int i = 1; i < classes.Count; i++)
+            ExistentClasses = new SortedList<string, int>();
+            ExistentClasses.Add(Classes[0], 1);
+            var k = 0;
+            var d = 2;
+            for (var i = 1; i < Classes.Count; i++)
             {
                 k = 0;
-                for (int j = 0; j < existentClasses.Count; j++)
-                    if (existentClasses.IndexOfKey(classes[i]) != -1) k++;
+                for (var j = 0; j < ExistentClasses.Count; j++)
+                    if (ExistentClasses.IndexOfKey(Classes[i]) != -1)
+                        k++;
                 if (k == 0)
                 {
-                    existentClasses.Add(classes[i], d);
+                    ExistentClasses.Add(Classes[i], d);
                     d++;
                 }
             }
-            return existentClasses.Count;
+
+            return ExistentClasses.Count;
         }
 
-        public System.Drawing.Color[,] ColorSOFM()
+        public Color[,] ColorSOFM()
         {
-            System.Drawing.Color[,] colorMatrix = new System.Drawing.Color[outputLayerDimension, outputLayerDimension];
-            int numOfClasses = NumberOfClasses();
-            List<System.Drawing.Color> goodColors = new List<System.Drawing.Color>();
-            goodColors.Add(System.Drawing.Color.Red);
-            goodColors.Add(System.Drawing.Color.Navy);
-            goodColors.Add(System.Drawing.Color.Green);
-            goodColors.Add(System.Drawing.Color.Yellow);
-            goodColors.Add(System.Drawing.Color.Cyan);
-            goodColors.Add(System.Drawing.Color.CornflowerBlue);
-            goodColors.Add(System.Drawing.Color.DarkOrange);
-            goodColors.Add(System.Drawing.Color.GreenYellow);
-            goodColors.Add(System.Drawing.Color.Bisque);
-            Random rnd = new Random();
-            for (int i = 0; i < numOfClasses - 7; i++)
-            {
+            var colorMatrix = new Color[OutputLayerDimension, OutputLayerDimension];
+            var numOfClasses = NumberOfClasses();
+            var goodColors = new List<Color>();
+            goodColors.Add(Color.Red);
+            goodColors.Add(Color.Navy);
+            goodColors.Add(Color.Green);
+            goodColors.Add(Color.Yellow);
+            goodColors.Add(Color.Cyan);
+            goodColors.Add(Color.CornflowerBlue);
+            goodColors.Add(Color.DarkOrange);
+            goodColors.Add(Color.GreenYellow);
+            goodColors.Add(Color.Bisque);
+            var rnd = new Random();
+            for (var i = 0; i < numOfClasses - 7; i++)
                 goodColors.Add(Color.FromArgb(100, rnd.Next(255), rnd.Next(125) * rnd.Next(2), rnd.Next(255)));
-            }
             //usedColors = new List<System.Drawing.Color>(numOfClasses);
             //usedColors.Add(goodColors[0]);
             LegendaColors = new Dictionary<Color, string>();
             //LegendaColors.Add(goodColors[0],classes[0]);
-            int k = 0;
-            int randomColor = 0;
-            Random r = new Random();
-            foreach (var classs in existentClasses)
+            var k = 0;
+            var randomColor = 0;
+            var r = new Random();
+            foreach (var classs in ExistentClasses)
             {
                 randomColor = r.Next(goodColors.Count);
                 if (!LegendaColors.ContainsKey(goodColors[randomColor]))
-                {
                     LegendaColors.Add(goodColors[randomColor], classs.Key);
-                }
                 else
-                {
-                    LegendaColors.Add(Color.FromArgb(100, rnd.Next(255), rnd.Next(125) * rnd.Next(2), rnd.Next(255)), classs.Key);
-                }
-                
+                    LegendaColors.Add(Color.FromArgb(100, rnd.Next(255), rnd.Next(125) * rnd.Next(2), rnd.Next(255)),
+                        classs.Key);
             }
+
             //while (LegendaColors.Count != numOfClasses)
             //{
             //    k = 0;
@@ -261,45 +225,45 @@ namespace NeuralNetworkLibrary
             //    //}
             //        LegendaColors.Add(goodColors[randomColor], existentClasses.Key);
             //}
-            for (int i = 0; i < outputLayerDimension; i++)
-                for (int j = 0; j < outputLayerDimension; j++)
-                    colorMatrix[i, j] = System.Drawing.Color.FromKnownColor(System.Drawing.KnownColor.ButtonFace);
+            for (var i = 0; i < OutputLayerDimension; i++)
+            for (var j = 0; j < OutputLayerDimension; j++)
+                colorMatrix[i, j] = Color.FromKnownColor(KnownColor.ButtonFace);
 
-            for (int i = 0; i < patterns.Count; i++)
+            for (var i = 0; i < Patterns.Count; i++)
             {
-                Neuron n = FindWinner(patterns[i]);
+                var n = FindWinner(Patterns[i]);
                 //if (isLearning)
                 //{
-                    //OutputLayer[n.Coordinate.X, n.Coordinate.Y].ClassAfterLearning =n.GetMaxSimilarClass();
-                    //n.ClassAfterLearning = n.GetMaxSimilarClass();
-                    //LegendaColors[LegendaColors.ElementAt(i).Key] = classes[i];
-                    //LegendaColors[LegendaColors.ElementAt(existentClasses[classes[i]] - 1).Key] = n.GetMaxSimilarClass();
+                //OutputLayer[n.Coordinate.X, n.Coordinate.Y].ClassAfterLearning =n.GetMaxSimilarClass();
+                //n.ClassAfterLearning = n.GetMaxSimilarClass();
+                //LegendaColors[LegendaColors.ElementAt(i).Key] = classes[i];
+                //LegendaColors[LegendaColors.ElementAt(existentClasses[classes[i]] - 1).Key] = n.GetMaxSimilarClass();
                 //}
-                colorMatrix[n.Coordinate.X, n.Coordinate.Y] = LegendaColors.ElementAt(existentClasses[classes[i]] - 1).Key;
+                colorMatrix[n.Coordinate.X, n.Coordinate.Y] =
+                    LegendaColors.ElementAt(ExistentClasses[Classes[i]] - 1).Key;
                 //colorMatrix[n.Coordinate.X, n.Coordinate.Y] = LegendaColors.FirstOrDefault(x => x.Value == n.ClassAfterLearning).Key; ;
             }
 
-            this.ColorMatrixNn = colorMatrix;
+            ColorMatrixNn = colorMatrix;
             return colorMatrix;
         }
 
 
         /// <summary>
-        /// Берет данные из файла и приводит к нужному формату с которого можно считать
+        ///     Берет данные из файла и приводит к нужному формату с которого можно считать
         /// </summary>
         /// <param name="inputDataFileName"></param>
         public void ReadDataFromFile(string inputDataFileName)
         {
-            StreamReader sr = new StreamReader(inputDataFileName);
-            string line = sr.ReadLine();
-            int k = 0;
-            for (int i = 0; i < line.Length; i++)
-            {
-                if (line[i] == ' ') k++;
-            }
+            var sr = new StreamReader(inputDataFileName);
+            var line = sr.ReadLine();
+            var k = 0;
+            for (var i = 0; i < line.Length; i++)
+                if (line[i] == ' ')
+                    k++;
 
-            inputLayerDimension = k;
-            int sigma0 = outputLayerDimension;
+            InputLayerDimension = k;
+            var sigma0 = OutputLayerDimension;
 
             k = 0;
             while (line != null)
@@ -307,8 +271,9 @@ namespace NeuralNetworkLibrary
                 line = sr.ReadLine();
                 k++;
             }
-            patterns = new List<List<double>>(k);
-            classes = new List<string>(k);
+
+            Patterns = new List<List<double>>(k);
+            Classes = new List<string>(k);
             numberOfPatterns = k;
 
             List<double> pattern;
@@ -318,61 +283,58 @@ namespace NeuralNetworkLibrary
 
             while (line != null)
             {
-                int startPos = 0;
-                int endPos = 0;
-                int j = 0;
-                pattern = new List<double>(inputLayerDimension); // Заполняет первый график двумя первыми числами
-                for (int ind = 0; ind < line.Length; ind++)
+                var startPos = 0;
+                var endPos = 0;
+                var j = 0;
+                pattern = new List<double>(InputLayerDimension); // Заполняет первый график двумя первыми числами
+                for (var ind = 0; ind < line.Length; ind++)
                 {
-                    if (line[ind] == ' ' && j != inputLayerDimension)
+                    if (line[ind] == ' ' && j != InputLayerDimension)
                     {
                         endPos = ind;
                         pattern.Add(Convert.ToDouble(line.Substring(startPos, endPos - startPos).Replace('.', ',')));
                         startPos = ind + 1;
                         j++;
                     }
-                    if (j > inputLayerDimension) throw new InvalidDataException("Wrong file format. Check input data file, and try again");
+
+                    if (j > InputLayerDimension)
+                        throw new InvalidDataException("Wrong file format. Check input data file, and try again");
                 }
-                if (normalize) this.NormalizeInputPattern(pattern); // (1) Этап нормализация входных параметров
-                patterns.Add(pattern);
+
+                if (Normalize) NormalizeInputPattern(pattern); // (1) Этап нормализация входных параметров
+                Patterns.Add(pattern);
                 if (line.LastIndexOf(' ') != -1)
                 {
                     startPos = line.LastIndexOf(' ');
-                    classes.Add(line.Substring(startPos));
+                    Classes.Add(line.Substring(startPos));
                     line = sr.ReadLine();
                 }
             }
+
             sr.Close();
 
             //
             currentRatingClasses = new Dictionary<string, int>();
-            foreach (var cl in classes)
-            {
-                if(!currentRatingClasses.ContainsKey(cl)) currentRatingClasses.Add(cl, 0);
-            }
+            foreach (var cl in Classes)
+                if (!currentRatingClasses.ContainsKey(cl))
+                    currentRatingClasses.Add(cl, 0);
 
             //
-            if (outputLayer == null)
+            if (OutputLayer == null)
             {
-                outputLayer = new Neuron[outputLayerDimension, outputLayerDimension];
+                OutputLayer = new Neuron[OutputLayerDimension, OutputLayerDimension];
 
                 // (2) Этап Заполнение случайными весами 
-                Random r = new Random();
-                for (int i = 0; i < outputLayerDimension; i++)
-                for (int j = 0; j < outputLayerDimension; j++)
+                var r = new Random();
+                for (var i = 0; i < OutputLayerDimension; i++)
+                for (var j = 0; j < OutputLayerDimension; j++)
                 {
-                    outputLayer[i, j] = new Neuron(i, j, sigma0);
-                    outputLayer[i, j].Weights = new List<double>(inputLayerDimension);
-                    outputLayer[i, j].UpdateSimilarMap(classes[r.Next(classes.Count)], currentRatingClasses);
-                    for (k = 0; k < inputLayerDimension; k++)
-                    {
-                        outputLayer[i, j].Weights.Add(r.NextDouble());
-                    }
+                    OutputLayer[i, j] = new Neuron(i, j, sigma0);
+                    OutputLayer[i, j].Weights = new List<double>(InputLayerDimension);
+                    OutputLayer[i, j].UpdateSimilarMap(Classes[r.Next(Classes.Count)], currentRatingClasses);
+                    for (k = 0; k < InputLayerDimension; k++) OutputLayer[i, j].Weights.Add(r.NextDouble());
                 }
             }
-
-            
-            
         }
 
         public event EndEpochEventHandler EndEpochEvent;

@@ -1,14 +1,8 @@
-﻿using NeuralNetworkLibrary;
-using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
-using System.Drawing;
+﻿using System;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.Windows.Forms.DataVisualization.Charting;
+using NeuralNetworkLibrary;
 
 namespace SimpleNeuralNetworkProgram
 {
@@ -16,7 +10,7 @@ namespace SimpleNeuralNetworkProgram
     {
         private NeuralNetwork nn;
 
-        public  NeuralNetworkForm()
+        public NeuralNetworkForm()
         {
             InitializeComponent();
             inputChart.Series.Add("InputVectors");
@@ -32,10 +26,7 @@ namespace SimpleNeuralNetworkProgram
         private void ShowInputVectorsOnChart()
         {
             inputChart.Series["InputVectors"].Points.Clear();
-            foreach (List<double> pattern in nn.Patterns)
-            {
-                inputChart.Series["InputVectors"].Points.AddXY(pattern[0], pattern[1]);
-            }
+            foreach (var pattern in nn.Patterns) inputChart.Series["InputVectors"].Points.AddXY(pattern[0], pattern[1]);
         }
 
         private void EndEpochEvent(object sender, EndEpochEventArgs e)
@@ -43,28 +34,28 @@ namespace SimpleNeuralNetworkProgram
             if (isVisibleOutputVectors.Checked)
             {
                 outputChart.Series["OutputVectors"].Points.Clear();
-                for (int i = 0; i < nn.OutputLayerDimension; i++)
-                for (int j = 0; j < nn.OutputLayerDimension; j++)
-                {
-                        outputChart.Series["OutputVectors"].Points
-                        .AddXY((object) ((double.TryParse(nn.OutputLayer[i, j].Weights[0].ToString(),out double d)) ? ValidateDataForChart(d) : 0),
-                                        ((double.TryParse(nn.OutputLayer[i, j].Weights[1].ToString(),out double f)) ? ValidateDataForChart(f) : 0));
-                        //.AddXY((object)((double.TryParse(nn.OutputLayer[i, j].Weights[0].ToString(), out double d)) ? (double.IsNaN(nn.OutputLayer[i, j].Weights[0])) ? 0 : (nn.OutputLayer[i, j].Weights[0] < Double.MinValue) ? Double.MinValue : d : 0),
-                        //    ((double.TryParse(nn.OutputLayer[i, j].Weights[1].ToString(), out double f)) ? (double.IsNaN(nn.OutputLayer[i, j].Weights[1])) ? 0 : (nn.OutputLayer[i, j].Weights[0] < Double.MinValue) ? Double.MinValue : f : 0));
-                }
+                for (var i = 0; i < nn.OutputLayerDimension; i++)
+                for (var j = 0; j < nn.OutputLayerDimension; j++)
+                    outputChart.Series["OutputVectors"].Points
+                        .AddXY(
+                            (object) (double.TryParse(nn.OutputLayer[i, j].Weights[0].ToString(), out var d)
+                                ? ValidateDataForChart(d)
+                                : 0),
+                            double.TryParse(nn.OutputLayer[i, j].Weights[1].ToString(), out var f)
+                                ? ValidateDataForChart(f)
+                                : 0);
+                //.AddXY((object)((double.TryParse(nn.OutputLayer[i, j].Weights[0].ToString(), out double d)) ? (double.IsNaN(nn.OutputLayer[i, j].Weights[0])) ? 0 : (nn.OutputLayer[i, j].Weights[0] < Double.MinValue) ? Double.MinValue : d : 0),
+                //    ((double.TryParse(nn.OutputLayer[i, j].Weights[1].ToString(), out double f)) ? (double.IsNaN(nn.OutputLayer[i, j].Weights[1])) ? 0 : (nn.OutputLayer[i, j].Weights[0] < Double.MinValue) ? Double.MinValue : f : 0));
             }
+
             Application.DoEvents();
         }
 
         private double ValidateDataForChart(double number)
         {
-            if (!double.IsNaN(number)) 
-            {
+            if (!double.IsNaN(number))
                 if (number < 0.000000000000000001E+10)
-                {
                     return 0.000000000000000001E+10;
-                }
-            }
 
             return 0;
         }
@@ -73,8 +64,9 @@ namespace SimpleNeuralNetworkProgram
         {
             inputChart.Series["InputVectors"].Points.Clear();
             outputChart.Series["OutputVectors"].Points.Clear();
-            inputChart.Series["InputVectors"].Points.AddXY(nn.Patterns[lbVectors.SelectedIndex][0], nn.Patterns[lbVectors.SelectedIndex][1]);
-            Neuron Winner = nn.FindWinner(nn.Patterns[lbVectors.SelectedIndex]);
+            inputChart.Series["InputVectors"].Points.AddXY(nn.Patterns[lbVectors.SelectedIndex][0],
+                nn.Patterns[lbVectors.SelectedIndex][1]);
+            var Winner = nn.FindWinner(nn.Patterns[lbVectors.SelectedIndex]);
             outputChart.Series["OutputVectors"].Points.AddXY(Winner.Weights[0], Winner.Weights[1]);
             neuralNetworkVisualizer.LightUpThePixel(Winner.Coordinate.X, Winner.Coordinate.Y);
         }
@@ -82,33 +74,33 @@ namespace SimpleNeuralNetworkProgram
         private void AddLegend()
         {
             panelLegend.Controls.Clear();
-            Label label = new Label();
+            var label = new Label();
             label.Name = "lblLegend";
             label.Top = 5;
             label.Left = 5;
             label.Text = "Legend";
             label.AutoSize = true;
             panelLegend.Controls.Add(label);
-            int i=0,ii = 0;
+            int i = 0, ii = 0;
             foreach (var legendaColor in nn.LegendaColors)
             {
-                Label lbl = new Label();
+                var lbl = new Label();
                 lbl.Name = "lbl" + legendaColor.Value;
                 lbl.Text = " - " + legendaColor.Value;
-                lbl.Top = 20 * (i + 1); 
+                lbl.Top = 20 * (i + 1);
                 lbl.AutoSize = true;
-                lbl.Left = 15 + (int)lbl.Font.Size;
-                this.panelLegend.Controls.Add(lbl);
+                lbl.Left = 15 + (int) lbl.Font.Size;
+                panelLegend.Controls.Add(lbl);
                 i++;
 
-                Panel panel = new Panel();
+                var panel = new Panel();
                 panel.Name = "panel" + legendaColor.Value;
-                panel.Top = 20 * (ii + 1) + (int)lbl.Font.Size / 2;
+                panel.Top = 20 * (ii + 1) + (int) lbl.Font.Size / 2;
                 panel.Left = 15;
-                panel.Width = (int)lbl.Font.Size;
-                panel.Height = (int)lbl.Font.Size;
+                panel.Width = (int) lbl.Font.Size;
+                panel.Height = (int) lbl.Font.Size;
                 panel.BackColor = legendaColor.Key;
-                this.panelLegend.Controls.Add(panel);
+                panelLegend.Controls.Add(panel);
                 ii++;
             }
             //for (int i = 0; i < nn.LegendaColors.Count; i++)
@@ -136,11 +128,11 @@ namespace SimpleNeuralNetworkProgram
         {
             lbVectors.Items.Clear();
             string patternString;
-            for (int i = 0; i < nn.Patterns.Count; i++)
+            for (var i = 0; i < nn.Patterns.Count; i++)
             {
                 patternString = "";
                 patternString += nn.Classes[i] + " ";
-                for (int j = 0; j < nn.InputLayerDimension; j++)
+                for (var j = 0; j < nn.InputLayerDimension; j++)
                     patternString += nn.Patterns[i][j].ToString("g2") + " ";
                 lbVectors.Items.Add(patternString);
             }
@@ -154,48 +146,45 @@ namespace SimpleNeuralNetworkProgram
 
         private void CheckSuccessPercentage()
         {
-            int success = 0;
-            int fail = 0;
-            for (int i = 0; i < nn.Patterns.Count; i++)
+            var success = 0;
+            var fail = 0;
+            for (var i = 0; i < nn.Patterns.Count; i++)
             {
-                Neuron Winner = nn.FindWinner(nn.Patterns[i]);
+                var Winner = nn.FindWinner(nn.Patterns[i]);
                 //int indexColor = nn.LegendaColors..IndexOf(nn.ColorMatrixNn[Winner.Coordinate.X, Winner.Coordinate.Y]);
                 //if (nn.Classes[i] == Winner.GetMaxSimilarClass())
                 //if (nn.Classes[i] == nn.OutputLayer[Winner.Coordinate.X, Winner.Coordinate.Y].ClassAfterLearning)
-                if (nn.LegendaColors.FirstOrDefault(x => x.Value == nn.Classes[i]).Key == nn.ColorMatrixNn[Winner.Coordinate.X, Winner.Coordinate.Y])
-                {
+                if (nn.LegendaColors.FirstOrDefault(x => x.Value == nn.Classes[i]).Key ==
+                    nn.ColorMatrixNn[Winner.Coordinate.X, Winner.Coordinate.Y])
                     success++;
-                }
                 else
-                {
                     fail++;
-                }
 
                 lbVectors.Items.Cast<string>();
-                string itemText = lbVectors.Items[i].ToString();
+                var itemText = lbVectors.Items[i].ToString();
                 lbVectors.Items.RemoveAt(i);
                 //lbVectors.Items.Insert(i, itemText+$"[{nn.ExistentClasses.Keys[indexColor]}]");
-                lbVectors.Items.Insert(i, itemText + $"[{nn.LegendaColors[nn.ColorMatrixNn[Winner.Coordinate.X, Winner.Coordinate.Y]]}]");
-                this.successLabel.Text = $"Успешно={success}/{nn.Patterns.Count}";
+                lbVectors.Items.Insert(i,
+                    itemText + $"[{nn.LegendaColors[nn.ColorMatrixNn[Winner.Coordinate.X, Winner.Coordinate.Y]]}]");
+                successLabel.Text = $"Успешно={success}/{nn.Patterns.Count}";
             }
         }
-        
 
 
         private void loadVectorsStart_Click(object sender, EventArgs e)
         {
-            int numberOfNeurons = (int)Math.Sqrt(Int32.Parse(textBoxCountOfNeurons.Text));
-            Functions f = Functions.Discrete;
+            var numberOfNeurons = (int) Math.Sqrt(int.Parse(textBoxCountOfNeurons.Text));
+            var f = Functions.Discrete;
 
-            Double tbEpsilon2 = Double.Parse(textBoxEpsilon.Text.Replace('.', ','));
+            var tbEpsilon2 = double.Parse(textBoxEpsilon.Text.Replace('.', ','));
             if (nn == null)
             {
                 nn = new NeuralNetwork(numberOfNeurons, 0, tbEpsilon2, f);
-                nn.EndEpochEvent += new EndEpochEventHandler(EndEpochEvent);
-                nn.Normalize = this.checkBoxNormalize.Checked;
+                nn.EndEpochEvent += EndEpochEvent;
+                nn.Normalize = checkBoxNormalize.Checked;
             }
 
-            OpenFileDialog ofd = new OpenFileDialog();
+            var ofd = new OpenFileDialog();
             if (ofd.ShowDialog() == DialogResult.OK)
             {
                 nn.ReadDataFromFile(ofd.FileName);

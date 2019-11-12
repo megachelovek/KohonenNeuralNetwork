@@ -202,5 +202,9 @@ namespace SimpleNeuralNetworkProgram
                 CheckSuccessPercentage();
             }
         }
+
+        
+
+
     }
 }

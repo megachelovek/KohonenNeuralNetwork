@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace NeuralNetworkLibrary
 {
-    class Matrix1D
+    public class Matrix1D
     {
         public int Size { get; }
 

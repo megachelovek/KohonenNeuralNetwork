@@ -44,6 +44,7 @@
   <ItemGroup>
     <Compile Include="EndEpochEventArgs.cs" />
     <Compile Include="Functions.cs" />
+    <Compile Include="Matrix1D.cs" />
     <Compile Include="NeuralNetwork.cs" />
     <Compile Include="Neuron.cs" />
     <Compile Include="Perceptron.cs" />

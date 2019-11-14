@@ -8,29 +8,23 @@ namespace NeuralNetworkLibrary
 {
     class SurroundingClass
     {
-        private var Copy; 
-        
-        private int Size;
 
-        private Matrix1D Weights;
+        private List<double> weights;
 
         private float _LearnRate;
 
         public SurroundingClass(int PerceptronSize, float LRate)
         {
-            this.Size = PerceptronSize;
-            this.Weights = new Matrix1D(this.Size);
-            this.Weights.RandomizeValues(-100, 100);
+            this.weights = new List<double>(PerceptronSize);
             this._LearnRate = LRate;
         }
 
-        public Matrix1D HypothesisFunction(Matrix1D Input)
+        public List<double> HypothesisFunction(List<double> Input)
         {
-            if (Input.Size != this.Size)
-                throw new Exception($"Input Matrix size shall match " + this.Size.ToString());
-            Matrix1D HypothesisFun = new Matrix1D(this.Size);
-
-            HypothesisFun = Input.Product(Weights);
+            if (Input.Count != this.weights.Count)
+                throw new Exception($"Input Matrix size shall match " + this.weights.Count.ToString());
+            List<double> HypothesisFun = Input;
+            
             return HypothesisFun;
         }
 
@@ -57,16 +51,20 @@ namespace NeuralNetworkLibrary
                 {
                     float Out = this.CalcOutput(Input[I], ActivationFunction);
                     IterateError = Out - Label[I];
-                    for (int Index = 0; Index <= this.Size - 1; Index++)
-                        this.Weights.Values[Index] = this.Weights.Values[Index] - this.LearnRate * IterateError * Input[I].GetValue(Index);
+                    for (int Index = 0; Index <= this.weights.Count - 1; Index++)
+                    {
+                        this.weights.Values[Index] = this.weights.Values[Index] -
+                                                     this.LearnRate * IterateError * Input[I].GetValue(Index);
+                    }
+
                     MSE += IterateError;
                     IterateError = 0;
                 }
+
                 // Calculate MSE
-                MSE = (float) (1 / (double)(2 * m) * MSE * MSE);
-            }
-            while (!MSE < 0.001 || Counter > 10000)// Reset error// iterate through training set
-                ;
+                MSE = (float) (1 / (double) (2 * m) * MSE * MSE);
+            } while (!MSE < 0.001 || Counter > 10000); // Reset error// iterate through training set
+
         }
 
     }

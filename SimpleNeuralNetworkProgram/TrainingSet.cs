@@ -10,31 +10,31 @@ namespace SimpleNeuralNetworkProgram
 {
     public class TrainingSet
     {
-        private int _PointsNum;
-        private int _Width;
-        private int _Height;
+        private int pointsNum;
+        private int width;
+        private int height;
         
-        private Matrix1D[] _Points;
-        private float[] _Labels;
+        private List<double> points;
+        private float[] labels;
 
-        private Random _Gen;
+        private Random random;
 
         public TrainingSet(int PointsNum, int Width, int Height)
         {
-            _PointsNum = PointsNum;
-            _Width = Width;
-            _Height = Height;
-            _Gen = new Random();
-            _Points = new Matrix1D[PointsNum - 1 + 1];
-            _Labels = new float[PointsNum - 1 + 1];
+            pointsNum = PointsNum;
+            width = Width;
+            height = Height;
+            random = new Random();
+            points = new List<double>(PointsNum - 1 + 1);
+            labels = new float[PointsNum - 1 + 1];
         }
         
 
-        public Matrix1D[] Points
+        public List<double> Points
         {
             get
             {
-                return _Points;
+                return points;
             }
         }
 
@@ -42,7 +42,7 @@ namespace SimpleNeuralNetworkProgram
         {
             get
             {
-                return _Labels;
+                return labels;
             }
         }
 

@@ -11,12 +11,12 @@ namespace NeuralNetworkLibrary
 
         private List<double> weights;
 
-        private float _LearnRate;
+        private float learnRate;
 
         public SurroundingClass(int PerceptronSize, float LRate)
         {
             this.weights = new List<double>(PerceptronSize);
-            this._LearnRate = LRate;
+            this.learnRate = LRate;
         }
 
         public List<double> HypothesisFunction(List<double> Input)
@@ -28,15 +28,21 @@ namespace NeuralNetworkLibrary
             return HypothesisFun;
         }
 
-
-        public float CalcOutput(Matrix1D Input, IActivationFunction ActivationFunction)
+        public float CalcOutput(List<double> Input, IActivationFunction ActivationFunction)
         {
-            float Hypothesis_x = this.HypothesisFunction(Input).Sum;
+            float Hypothesis_x = (float) SumAllElements(this.HypothesisFunction(Input));
 
             return ActivationFunction.Function(Hypothesis_x);
         }
 
-        public void TrainPerceptron(Matrix1D[] Input, float[] Label, IActivationFunction ActivationFunction)
+        public float CalcOutput(double Input, IActivationFunction ActivationFunction)
+        {
+            float Hypothesis_x = (float)SumAllElements(this.HypothesisFunction( new List<double>{Input}));
+
+            return ActivationFunction.Function(Hypothesis_x);
+        }
+
+        public void TrainPerceptron(List<double> Input, float[] Label, IActivationFunction ActivationFunction)
         {
             int m = Input.Count();  // training set size
             int Counter = 0;      // number of iterations
@@ -53,8 +59,7 @@ namespace NeuralNetworkLibrary
                     IterateError = Out - Label[I];
                     for (int Index = 0; Index <= this.weights.Count - 1; Index++)
                     {
-                        this.weights.Values[Index] = this.weights.Values[Index] -
-                                                     this.LearnRate * IterateError * Input[I].GetValue(Index);
+                        this.weights[Index] = this.weights[Index] - this.learnRate * IterateError * Index;
                     }
 
                     MSE += IterateError;
@@ -63,8 +68,19 @@ namespace NeuralNetworkLibrary
 
                 // Calculate MSE
                 MSE = (float) (1 / (double) (2 * m) * MSE * MSE);
-            } while (!MSE < 0.001 || Counter > 10000); // Reset error// iterate through training set
+            } while (MSE < 0.001 || Counter > 10000); // Reset error// iterate through training set
 
+        }
+
+        public double SumAllElements(List<double> elements)
+        {
+            double result = 0;
+            foreach (var elemList in elements)
+            {
+                result += elemList;
+            }
+
+            return result;
         }
 
     }

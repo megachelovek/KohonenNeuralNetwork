@@ -28,7 +28,6 @@ namespace SimpleNeuralNetworkProgram
             points = new List<double>(PointsNum - 1 + 1);
             labels = new float[PointsNum - 1 + 1];
         }
-        
 
         public List<double> Points
         {

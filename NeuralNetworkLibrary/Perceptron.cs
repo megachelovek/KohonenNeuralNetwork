@@ -6,9 +6,8 @@ using System.Threading.Tasks;
 
 namespace NeuralNetworkLibrary
 {
-    class SurroundingClass
+    public class SurroundingClass
     {
-
         private List<double> weights;
 
         private float learnRate;
@@ -16,6 +15,11 @@ namespace NeuralNetworkLibrary
         public SurroundingClass(int PerceptronSize, float LRate)
         {
             this.weights = new List<double>(PerceptronSize);
+            Random rnd = new Random();
+            for (int i = 0; i < this.weights.Capacity; i++)
+            {
+                this.weights.Add(rnd.NextDouble());
+            }
             this.learnRate = LRate;
         }
 
@@ -42,18 +46,18 @@ namespace NeuralNetworkLibrary
             return ActivationFunction.Function(Hypothesis_x);
         }
 
-        public void TrainPerceptron(List<double> Input, float[] Label, IActivationFunction ActivationFunction)
+        public void TrainPerceptron(List<List<double>> Input, float[] Label, IActivationFunction ActivationFunction)
         {
-            int m = Input.Count();  // training set size
-            int Counter = 0;      // number of iterations
+            int countOfVectors = Input.Count();  // training set size
+            int iterationCounter = 0;      // number of iterations
             float MSE = 0;           // To track error MSE
             float IterateError = 0;  // To Track error in each iteration
 
             do
             {
-                Counter += 1;
+                iterationCounter += 1;
                 MSE = 0;
-                for (int I = 0; I <= m - 1; I++)
+                for (int I = 0; I <= countOfVectors - 1; I++)
                 {
                     float Out = this.CalcOutput(Input[I], ActivationFunction);
                     IterateError = Out - Label[I];
@@ -67,8 +71,8 @@ namespace NeuralNetworkLibrary
                 }
 
                 // Calculate MSE
-                MSE = (float) (1 / (double) (2 * m) * MSE * MSE);
-            } while (MSE < 0.001 || Counter > 10000); // Reset error// iterate through training set
+                MSE = (float) (1 / (double) (2 * countOfVectors) * MSE * MSE);
+            } while (MSE < 0.001 || iterationCounter > 10000); // Reset error// iterate through training set
 
         }
 

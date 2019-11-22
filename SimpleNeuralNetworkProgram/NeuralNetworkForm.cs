@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Windows.Forms;
 using System.Windows.Forms.DataVisualization.Charting;
@@ -168,6 +169,28 @@ namespace SimpleNeuralNetworkProgram
                     itemText + $"[{nn.LegendaColors[nn.ColorMatrixNn[Winner.Coordinate.X, Winner.Coordinate.Y]]}]");
                 successLabel.Text = $"Успешно={success}/{nn.Patterns.Count}";
             }
+
+            var answers = CreateLabelForPerceptron();
+            SurroundingClass perceptron = new SurroundingClass(nn.Patterns[0].Count,0.1f);
+            perceptron.TrainPerceptron(nn.Patterns, answers, new IdentityFunction());
+
+                
+        }
+
+        /// <summary>
+        /// Заполняет массив лейбл для передачи правильных ответов классов в виде цифр
+        /// </summary>
+        /// <param name="patterns"></param>
+        /// <returns></returns>
+        private float[] CreateLabelForPerceptron()
+        {
+            float[] result = new float[nn.Patterns.Count];
+            for (var i = 0; i < nn.Patterns.Count; i++)
+            {
+                result[i] = (float)nn.ExistentClasses[nn.Classes[i]];
+            }
+
+            return result;
         }
 
 

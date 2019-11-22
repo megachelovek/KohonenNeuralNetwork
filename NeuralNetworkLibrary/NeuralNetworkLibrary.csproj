@@ -46,6 +46,7 @@
     <Compile Include="Functions.cs" />
     <Compile Include="ActivationFunction\IActivationFunction.cs" />
     <Compile Include="ActivationFunction\IdentityFunction.cs" />
+    <Compile Include="Matrix1D%282%29.cs" />
     <Compile Include="Matrix1D.cs" />
     <Compile Include="NeuralNetwork.cs" />
     <Compile Include="Neuron.cs" />

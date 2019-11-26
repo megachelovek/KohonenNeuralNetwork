@@ -39,10 +39,10 @@ namespace SimpleNeuralNetworkProgram
                 for (var j = 0; j < nn.OutputLayerDimension; j++)
                     outputChart.Series["OutputVectors"].Points
                         .AddXY(
-                            (object) (double.TryParse(nn.OutputLayer[i, j].Weights[0].ToString(), out var d)
+                            (object) (double.TryParse(nn.OutputLayer[i][j].Weights[0].ToString(), out var d)
                                 ? ValidateDataForChart(d)
                                 : 0),
-                            double.TryParse(nn.OutputLayer[i, j].Weights[1].ToString(), out var f)
+                            double.TryParse(nn.OutputLayer[i][j].Weights[1].ToString(), out var f)
                                 ? ValidateDataForChart(f)
                                 : 0);
                 //.AddXY((object)((double.TryParse(nn.OutputLayer[i, j].Weights[0].ToString(), out double d)) ? (double.IsNaN(nn.OutputLayer[i, j].Weights[0])) ? 0 : (nn.OutputLayer[i, j].Weights[0] < Double.MinValue) ? Double.MinValue : d : 0),
@@ -171,8 +171,9 @@ namespace SimpleNeuralNetworkProgram
             }
 
             var answers = CreateLabelForPerceptron();
-            SurroundingClass perceptron = new SurroundingClass(nn.Patterns[0].Count,0.1f);
-            perceptron.TrainPerceptron(nn.Patterns, answers, new IdentityFunction());
+            NeuralNetwork perceptron = new NeuralNetwork(5,0,);
+//            SurroundingClass perceptron = new SurroundingClass(nn.Patterns[0].Count,0.1f);
+//            perceptron.TrainPerceptron(nn.Patterns, answers, new IdentityFunction());
 
                 
         }
@@ -182,12 +183,12 @@ namespace SimpleNeuralNetworkProgram
         /// </summary>
         /// <param name="patterns"></param>
         /// <returns></returns>
-        private float[] CreateLabelForPerceptron()
+        private double[] CreateLabelForPerceptron()
         {
-            float[] result = new float[nn.Patterns.Count];
+            double[] result = new double[nn.Patterns.Count];
             for (var i = 0; i < nn.Patterns.Count; i++)
             {
-                result[i] = (float)nn.ExistentClasses[nn.Classes[i]];
+                result[i] = nn.ExistentClasses[nn.Classes[i]];
             }
 
             return result;

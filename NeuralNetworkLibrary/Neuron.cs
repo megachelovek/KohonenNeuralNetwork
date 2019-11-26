@@ -2,21 +2,26 @@
 using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
+using NeuralNetworkLibrary.PerceptronLibrary;
 
 namespace NeuralNetworkLibrary
 {
     public class Neuron
     {
         private readonly double alpha0 = 0.1;
+        private readonly Dictionary<string, int> similarityClassForLearning;
+        private readonly int tau2 = 1000;
         public string ClassAfterLearning;
         private Point coordinate;
         private double Nyu2 = 0.5;
         private int sigma0;
-        private readonly Dictionary<string, int> similarityClassForLearning;
         private double tau1;
-        private readonly int tau2 = 1000;
-        private List<double> weights;
+        private List<double> weights; 
         private int weightsdimension;
+        public double outputPulse;
+
+
+        #region DefaultFunctions
 
         public double Norm
         {
@@ -46,8 +51,6 @@ namespace NeuralNetworkLibrary
             {
                 modificationValue =
                     NyuFormula(iteration) * h(winnerCoordinate, f) * (pattern[i] - weights[i]); // WTA формула
-                //modificationValue = Nyu2 * (pattern[i] - weights[i]) + weights[i];
-                //h(winnerCoordinate, countOfNeurons,f) * (pattern[i] - weights[i]);
                 weights[i] += modificationValue;
                 avgDelta += modificationValue; // Здесь сумма всех весов
             }
@@ -55,25 +58,50 @@ namespace NeuralNetworkLibrary
             avgDelta = avgDelta / weightsdimension;
             return avgDelta;
         }
-
-        //СПОРНАЯ ШТУКА, ЛУЧШЕ ПОКА НЕ ИСПОЛЬЗОВАТЬ
+        
         public void UpdateSimilarMap(string nameClass, Dictionary<string, int> currentClasses)
         {
-            //Dictionary<string, int> sortedDict = currentClasses.OrderByDescending(pair => pair.Value)
-            //    .Take(currentClasses.Count).ToDictionary(pair => pair.Key, pair => pair.Value);
-            //int index = Array.IndexOf(sortedDict.Keys.ToArray(), nameClass)-1;
-            //double differenceBetweenClasses = (Math.Round((double)sortedDict.Values.Max() / currentClasses[nameClass])/5)-3;
             if (!similarityClassForLearning.ContainsKey(nameClass))
                 similarityClassForLearning.Add(nameClass, 1);
             else
                 similarityClassForLearning[nameClass]++;
         }
 
-        //СПОРНАЯ ШТУКА, ЛУЧШЕ ПОКА НЕ ИСПОЛЬЗОВАТЬ
-        public string GetMaxSimilarClass()
+        #endregion
+
+        #region PerceptronFunctions
+
+        public void Fire()
         {
-            return similarityClassForLearning.Aggregate((x, y) => x.Value > y.Value ? x : y).Key ?? null;
+            outputPulse = Sum();
+            outputPulse = Activation(outputPulse);
         }
+
+        private double Sum()
+        {
+            double computeValue = 0.0f;
+            foreach (var d in Dendrites)
+            {
+                computeValue += d.InputPulse * d.SynapticWeight;
+            }
+            return computeValue;
+        }
+
+        public void UpdateWeights(double new_weights)
+        {
+            foreach (var terminal in Dendrites)
+            {
+                terminal.SynapticWeight = new_weights;
+            }
+        }
+
+        private double Activation(double input)
+        {
+            double threshold = 1;
+            return input <= threshold ? 0 : threshold;
+        }
+
+        #endregion
 
         #region Второстепенные функции
 
@@ -88,13 +116,7 @@ namespace NeuralNetworkLibrary
         {
             return alpha0 * Math.Exp(-t / tau2);
         }
-
-        //private double Sigma(int t)
-        //{
-        //    double value = sigma0 * Math.Exp(-t / tau1);
-        //    return value;
-        //}
-
+        
         public List<double> Weights
         {
             get => weights;
@@ -104,6 +126,8 @@ namespace NeuralNetworkLibrary
                 weightsdimension = weights.Capacity;
             }
         }
+
+        public List<Dendrite> Dendrites { get; set; } //FOR perceptron
 
         public Point Coordinate
         {
@@ -166,8 +190,6 @@ namespace NeuralNetworkLibrary
                     distance = Math.Sqrt(Math.Pow(winnerCoordinate.X - coordinate.X, 2) +
                                          Math.Pow(winnerCoordinate.Y - coordinate.Y, 2));
                     result = Math.Exp(-(distance * distance) / Math.Pow(NyuFormula(Iteration), 2));
-
-                    //distance = Math.Sqrt(Math.Pow((winnerCoordinate.X - coordinate.X), 2) - Math.Pow((winnerCoordinate.Y - coordinate.Y), 2)); //Евклидова мера 
                     return result;
                 }
                     break;

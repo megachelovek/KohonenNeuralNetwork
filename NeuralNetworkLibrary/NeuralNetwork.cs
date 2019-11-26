@@ -35,7 +35,7 @@ namespace NeuralNetworkLibrary
         public SortedList<string, int> ExistentClasses { get; private set; }
 
         #region DefaultNetworkFunctions
-        public NeuralNetwork(int sqrtOfCountNeurons, int numberOfIterations, double valueSko, Functions f, bool isPerceptron = false, int hiddenLayerDimension = 0)
+        public NeuralNetwork(int sqrtOfCountNeurons, int numberOfIterations, double valueSko, Functions f, bool isPerceptron = false)
         {
             OutputLayerDimension = sqrtOfCountNeurons;
             currentIteration = 1;
@@ -44,10 +44,14 @@ namespace NeuralNetworkLibrary
             valueSKO = valueSko;
             CurrentDelta = 100;
             this.isPerceptron = isPerceptron;
-            if (isPerceptron)
-            {
-
-            }
+        }
+        public NeuralNetwork(int sqrtOfCountNeurons, int numberOfIterations, double valueSko, bool isPerceptron=true)
+        {
+            OutputLayerDimension = sqrtOfCountNeurons;
+            currentIteration = 1;
+            this.numberOfIterations = numberOfIterations;
+            valueSKO = valueSko;
+            this.isPerceptron = isPerceptron;
         }
 
         //(3) этап Евклидова мера

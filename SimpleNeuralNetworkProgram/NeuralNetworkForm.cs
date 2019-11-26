@@ -171,7 +171,7 @@ namespace SimpleNeuralNetworkProgram
             }
 
             var answers = CreateLabelForPerceptron();
-            NeuralNetwork perceptron = new NeuralNetwork(5,0,);
+            NeuralNetwork perceptron = new NeuralNetwork(5,0,1,);
 //            SurroundingClass perceptron = new SurroundingClass(nn.Patterns[0].Count,0.1f);
 //            perceptron.TrainPerceptron(nn.Patterns, answers, new IdentityFunction());
 

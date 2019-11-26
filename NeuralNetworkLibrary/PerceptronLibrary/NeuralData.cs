@@ -16,11 +16,6 @@ namespace NeuralNetworkLibrary.PerceptronLibrary
         {
             Data = new List<double>(rows);
         }
-
-        public void Add(params double[] rec)
-        {
-            Data[counter] = rec;
-            counter++;
-        }
+        
     }
 }

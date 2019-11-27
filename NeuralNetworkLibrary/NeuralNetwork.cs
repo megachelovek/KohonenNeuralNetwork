@@ -47,6 +47,8 @@ namespace NeuralNetworkLibrary
         }
         public NeuralNetwork(int sqrtOfCountNeurons, int numberOfIterations, double valueSko, bool isPerceptron=true)
         {
+            this.weightsLayouts = new List<double>();
+            this.OutputLayer = new List<List<Neuron>>();
             OutputLayerDimension = sqrtOfCountNeurons;
             currentIteration = 1;
             this.numberOfIterations = numberOfIterations;
@@ -189,7 +191,7 @@ namespace NeuralNetworkLibrary
         public void AddNeuralLayer(int count, double initialWeight)
         {
             OutputLayer.Add(new List<Neuron>());
-            int lastIndex = OutputLayer.Count;
+            int lastIndex = OutputLayer.Count-1;
             weightsLayouts.Add(initialWeight);
             for (int i = 0; i < count; i++)
             {
@@ -217,7 +219,7 @@ namespace NeuralNetworkLibrary
             }
         }
 
-        public void TrainPerceptron(List<List<double>> X, double[] Y, int iterations, double learningRate = 0.1)
+        public void TrainPerceptron(List<List<double>> neuralData, double[] answersNumberOfClass, int iterations, double learningRate = 0.1)
         {
             int epoch = 1;
             //Loop till the number of iterations
@@ -228,12 +230,12 @@ namespace NeuralNetworkLibrary
                 List<double> outputs = new List<double>();
 
                 //Loop through the record
-                for (int i = 0; i < X.Count; i++)
+                for (int i = 0; i < neuralData.Count; i++)
                 {
                     //Set the input data into the first layer
-                    for (int j = 0; j < X[i].Count; j++)
+                    for (int j = 0; j < neuralData[i].Count; j++)
                     {
-                        inputLayer[j].outputPulse = X[i][j];
+                        inputLayer[j].outputPulse = neuralData[i][j];
                     }
 
                     //Fire all the neurons and collect the output
@@ -245,7 +247,7 @@ namespace NeuralNetworkLibrary
                 double accuracySum = 0;
                 int y_counter = 0;
                 outputs.ForEach((x) => {
-                    if (x == Y[y_counter]) //ТУТ МБ ВОПРОС
+                    if (x == answersNumberOfClass[y_counter]) //ТУТ МБ ВОПРОС
                     {
                         accuracySum++;
                     }

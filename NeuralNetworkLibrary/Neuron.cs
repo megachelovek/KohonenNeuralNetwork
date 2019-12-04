@@ -80,18 +80,25 @@ namespace NeuralNetworkLibrary
         private double Sum()
         {
             double computeValue = 0.0f;
-            foreach (var d in Dendrites)
+            if (Dendrites != null)
             {
-                computeValue += d.InputPulse * d.SynapticWeight;
+                foreach (var d in Dendrites)
+                {
+                    computeValue += d.InputPulse * d.SynapticWeight;
+                }
             }
+
             return computeValue;
         }
 
         public void UpdateWeights(double new_weights)
         {
-            foreach (var terminal in Dendrites)
+            if (Dendrites != null)
             {
-                terminal.SynapticWeight = new_weights;
+                foreach (var terminal in Dendrites)
+                {
+                    terminal.SynapticWeight = new_weights;
+                }
             }
         }
 

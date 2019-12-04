@@ -188,7 +188,7 @@ namespace NeuralNetworkLibrary
             }
         }
 
-        public void AddNeuralLayer(int count, double initialWeight)
+        public void AddNeuralLayer(int count, double initialWeight)//public NeuralLayer(int count, double initialWeight, string name = "")
         {
             OutputLayer.Add(new List<Neuron>());
             int lastIndex = OutputLayer.Count-1;
@@ -200,6 +200,38 @@ namespace NeuralNetworkLibrary
                 for (int k = 0; k < InputLayerDimension; k++) OutputLayer[lastIndex][i].Weights.Add(initialWeight);
             }
 
+            AddDendritesToAllLayers();
+        }
+
+        private void AddDendritesToAllLayers()//public void AddLayer(NeuralLayer layer)
+        {
+            //int dendriteCount = 1;//TODO переделать
+            //if (OutputLayer.Count > 0)
+            //{
+            //    dendriteCount = OutputLayer.Last().Count;
+            //}
+
+            for (var index = 0; index < OutputLayer.Count; index++)
+            {
+                var element = OutputLayer[index];
+                if (index+1 != OutputLayer.Count)
+                {
+                    for (var index1 = 0; index1 < OutputLayer[index].Count; index1++)
+                    {
+                        var neuron = OutputLayer[index][index1];
+                        int dendriteCount = OutputLayer[index + 1].Count;
+                        if (neuron.Dendrites == null)
+                        {
+                            neuron.Dendrites = new List<Dendrite>();
+                        }
+
+                        for (int i = 0; i < dendriteCount; i++)
+                        {
+                            neuron.Dendrites.Add(new Dendrite());
+                        }
+                    }
+                }
+            }
         }
 
         public void Optimize(int numberOfLayer, double learningRate, double delta)

@@ -177,8 +177,6 @@ namespace SimpleNeuralNetworkProgram
             perceptron.TrainPerceptron(nn.Patterns,answers,20,0.1);
             //SurroundingClass perceptron = new SurroundingClass(nn.Patterns[0].Count,0.1f);
             //perceptron.TrainPerceptron(nn.Patterns, answers, new IdentityFunction());
-
-
         }
 
         /// <summary>

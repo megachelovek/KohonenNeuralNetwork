@@ -19,6 +19,7 @@ namespace NeuralNetworkLibrary
         private List<double> weights; 
         private int weightsdimension;
         public double outputPulse;
+        public string className;
 
 
         #region DefaultFunctions
@@ -59,12 +60,17 @@ namespace NeuralNetworkLibrary
             return avgDelta;
         }
         
-        public void UpdateSimilarMap(string nameClass, Dictionary<string, int> currentClasses)
+        public void UpdateSimilarMap(string nameClass)
         {
             if (!similarityClassForLearning.ContainsKey(nameClass))
                 similarityClassForLearning.Add(nameClass, 1);
             else
                 similarityClassForLearning[nameClass]++;
+        }
+
+        public void SetUpClassNameViaSimilarMap()
+        {
+            className = similarityClassForLearning.Aggregate((x, y) => x.Value > y.Value ? x : y).Key;
         }
 
         #endregion

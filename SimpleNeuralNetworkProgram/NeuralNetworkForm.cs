@@ -10,7 +10,7 @@ namespace SimpleNeuralNetworkProgram
     public partial class NeuralNetworkForm : Form
     {
         private NeuralNetwork nn;
-
+        private string fileName;
         public NeuralNetworkForm()
         {
             InitializeComponent();
@@ -104,25 +104,6 @@ namespace SimpleNeuralNetworkProgram
                 panelLegend.Controls.Add(panel);
                 ii++;
             }
-            //for (int i = 0; i < nn.LegendaColors.Count; i++)
-            //{
-            //    Label lbl = new Label();
-            //    lbl.Name = "lbl" + nn.ExistentClasses.Keys[i];
-            //    lbl.Text = " - " + nn.LegendaColors.ElementAt(i).Value;
-            //    lbl.Top = 20 * (i + 1);
-            //    lbl.AutoSize = true;
-            //    lbl.Left = 15 + (int)lbl.Font.Size;
-            //    this.panelLegend.Controls.Add(lbl);
-
-            //    Panel panel = new Panel();
-            //    panel.Name = "panel" + nn.ExistentClasses.Keys[i];
-            //    panel.Top = 20 * (i + 1) + (int)lbl.Font.Size / 2;
-            //    panel.Left = 15;
-            //    panel.Width = (int)lbl.Font.Size;
-            //    panel.Height = (int)lbl.Font.Size;
-            //    panel.BackColor = nn.LegendaColors.Keys.ElementAt(i);
-            //    this.panelLegend.Controls.Add(panel);
-            //}
         }
 
         private void AddPatternsToListBox()
@@ -174,10 +155,31 @@ namespace SimpleNeuralNetworkProgram
             NeuralNetwork perceptron = new NeuralNetwork(5,0,1,true);
             perceptron.AddNeuralLayer(4,0.1); //Количество параметров
             perceptron.AddNeuralLayer(1, 0.1);
+            perceptron.Build();
             perceptron.TrainPerceptron(nn.Patterns,answers,20,0.1);
+            perceptron.ReadDataFromFile(fileName);
+            perceptron.CreateClassNamesForEachNeuron();
+            
+            for (var i = 0; i < nn.Patterns.Count; i++)
+            {
+                var Winner = perceptron.FindWinner(nn.Patterns[i]);//PERSEPTRON
+                if (Winner.className ==nn.Classes[i])
+                    success++;
+                else
+                    fail++;
+
+                lbVectors.Items.Cast<string>();
+                var itemText = lbVectors.Items[i].ToString();
+                lbVectors.Items.RemoveAt(i);
+                lbVectors.Items.Insert(i,
+                    itemText + $"<{Winner.className}>");
+                successLabel.Text = $"Успешно={success}/{nn.Patterns.Count}";
+            }
+
+
             //SurroundingClass perceptron = new SurroundingClass(nn.Patterns[0].Count,0.1f);
-            //perceptron.TrainPerceptron(nn.Patterns, answers, new IdentityFunction());
-        }
+                //perceptron.TrainPerceptron(nn.Patterns, answers, new IdentityFunction());
+            }
 
         /// <summary>
         /// Заполняет массив лейбл для передачи правильных ответов классов в виде цифр
@@ -212,6 +214,7 @@ namespace SimpleNeuralNetworkProgram
             var ofd = new OpenFileDialog();
             if (ofd.ShowDialog() == DialogResult.OK)
             {
+                fileName = ofd.FileName;
                 nn.ReadDataFromFile(ofd.FileName);
                 neuralNetworkVisualizer.Matrix = null;
                 panelLegend.Visible = false;

@@ -27,7 +27,7 @@ namespace NeuralNetworkLibrary
         public List<List<Neuron>> OutputLayer { get; set; }
         public Color[,] ColorMatrixNn { get; private set; }
         public bool Normalize { get; set; }
-        public List<List<double>> Patterns { get; private set; }
+        public List<List<double>> Patterns { get; set; }
         public List<string> Classes { get; private set; }
         public int InputLayerDimension { get; private set; }
         public int OutputLayerDimension { get; }
@@ -400,6 +400,23 @@ namespace NeuralNetworkLibrary
 
             ColorMatrixNn = colorMatrix;
             return colorMatrix;
+        }
+
+        public void CreateClassNamesForEachNeuron()
+        {
+            for (var index = 0; index < Patterns.Count; index++)
+            {
+                var oneVector = Patterns[index];
+                FindWinner(oneVector).UpdateSimilarMap(Classes[index]);
+            }
+
+            foreach (var layer in OutputLayer)
+            {
+                foreach (var neuron in layer)
+                {
+                    neuron.SetUpClassNameViaSimilarMap();
+                }
+            }
         }
 
 

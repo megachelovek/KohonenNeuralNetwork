@@ -70,7 +70,14 @@ namespace NeuralNetworkLibrary
 
         public void SetUpClassNameViaSimilarMap()
         {
-            className = similarityClassForLearning.Aggregate((x, y) => x.Value > y.Value ? x : y).Key;
+            if (similarityClassForLearning.Count == 0)
+            {
+                className = "none";
+            }
+            else
+            {
+                className = similarityClassForLearning.Aggregate((x, y) => x.Value > y.Value ? x : y).Key;
+            }
         }
 
         #endregion
@@ -101,8 +108,10 @@ namespace NeuralNetworkLibrary
         {
             if (Dendrites != null)
             {
-                foreach (var terminal in Dendrites)
+                for (var index = 0; index < Dendrites.Count; index++)
                 {
+                    var terminal = Dendrites[index];
+                    //weights[index] = new_weights;
                     terminal.SynapticWeight = new_weights;
                 }
             }

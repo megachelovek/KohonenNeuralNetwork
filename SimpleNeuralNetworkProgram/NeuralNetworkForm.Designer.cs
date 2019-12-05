@@ -39,6 +39,7 @@
             this.label2 = new System.Windows.Forms.Label();
             this.label1 = new System.Windows.Forms.Label();
             this.inputParams = new System.Windows.Forms.GroupBox();
+            this.button1 = new System.Windows.Forms.Button();
             this.successLabel = new System.Windows.Forms.Label();
             this.lbVectors = new System.Windows.Forms.ListBox();
             this.loadVectorsStart = new System.Windows.Forms.Button();
@@ -50,7 +51,7 @@
             this.label5 = new System.Windows.Forms.Label();
             this.panelLegend = new System.Windows.Forms.Panel();
             this.neuralNetworkVisualizer = new SimpleNeuralNetworkProgram.NeuralNetworkVisualizer();
-            this.button1 = new System.Windows.Forms.Button();
+            this.successLabel2 = new System.Windows.Forms.Label();
             this.groupBox1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.outputChart)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.inputChart)).BeginInit();
@@ -65,9 +66,9 @@
             this.groupBox1.Controls.Add(this.label2);
             this.groupBox1.Controls.Add(this.label1);
             this.groupBox1.Location = new System.Drawing.Point(8, 8);
-            this.groupBox1.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
+            this.groupBox1.Margin = new System.Windows.Forms.Padding(2);
             this.groupBox1.Name = "groupBox1";
-            this.groupBox1.Padding = new System.Windows.Forms.Padding(2, 2, 2, 2);
+            this.groupBox1.Padding = new System.Windows.Forms.Padding(2);
             this.groupBox1.Size = new System.Drawing.Size(333, 466);
             this.groupBox1.TabIndex = 2;
             this.groupBox1.TabStop = false;
@@ -77,7 +78,7 @@
             // 
             this.isVisibleOutputVectors.AutoSize = true;
             this.isVisibleOutputVectors.Location = new System.Drawing.Point(91, 241);
-            this.isVisibleOutputVectors.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
+            this.isVisibleOutputVectors.Margin = new System.Windows.Forms.Padding(2);
             this.isVisibleOutputVectors.Name = "isVisibleOutputVectors";
             this.isVisibleOutputVectors.Size = new System.Drawing.Size(145, 17);
             this.isVisibleOutputVectors.TabIndex = 6;
@@ -93,7 +94,7 @@
             this.outputChart.ImeMode = System.Windows.Forms.ImeMode.KatakanaHalf;
             this.outputChart.IsSoftShadows = false;
             this.outputChart.Location = new System.Drawing.Point(7, 259);
-            this.outputChart.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
+            this.outputChart.Margin = new System.Windows.Forms.Padding(2);
             this.outputChart.Name = "outputChart";
             this.outputChart.Palette = System.Windows.Forms.DataVisualization.Charting.ChartColorPalette.SemiTransparent;
             series1.ChartArea = "ChartArea1";
@@ -111,7 +112,7 @@
             this.inputChart.ImeMode = System.Windows.Forms.ImeMode.KatakanaHalf;
             this.inputChart.IsSoftShadows = false;
             this.inputChart.Location = new System.Drawing.Point(7, 39);
-            this.inputChart.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
+            this.inputChart.Margin = new System.Windows.Forms.Padding(2);
             this.inputChart.Name = "inputChart";
             this.inputChart.Palette = System.Windows.Forms.DataVisualization.Charting.ChartColorPalette.Excel;
             series2.ChartArea = "ChartArea1";
@@ -143,6 +144,7 @@
             // 
             // inputParams
             // 
+            this.inputParams.Controls.Add(this.successLabel2);
             this.inputParams.Controls.Add(this.button1);
             this.inputParams.Controls.Add(this.successLabel);
             this.inputParams.Controls.Add(this.lbVectors);
@@ -153,13 +155,26 @@
             this.inputParams.Controls.Add(this.textBoxCountOfNeurons);
             this.inputParams.Controls.Add(this.label3);
             this.inputParams.Location = new System.Drawing.Point(345, 8);
-            this.inputParams.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
+            this.inputParams.Margin = new System.Windows.Forms.Padding(2);
             this.inputParams.Name = "inputParams";
-            this.inputParams.Padding = new System.Windows.Forms.Padding(2, 2, 2, 2);
+            this.inputParams.Padding = new System.Windows.Forms.Padding(2);
             this.inputParams.Size = new System.Drawing.Size(461, 466);
             this.inputParams.TabIndex = 3;
             this.inputParams.TabStop = false;
             this.inputParams.Text = "Входные параметры";
+            // 
+            // button1
+            // 
+            this.button1.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
+            this.button1.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(192)))), ((int)(((byte)(255)))), ((int)(((byte)(192)))));
+            this.button1.Location = new System.Drawing.Point(310, 116);
+            this.button1.Margin = new System.Windows.Forms.Padding(2);
+            this.button1.Name = "button1";
+            this.button1.Size = new System.Drawing.Size(147, 46);
+            this.button1.TabIndex = 8;
+            this.button1.Text = "Запустить персептрон";
+            this.button1.UseVisualStyleBackColor = false;
+            this.button1.Click += new System.EventHandler(this.button1_Click);
             // 
             // successLabel
             // 
@@ -174,7 +189,7 @@
             // 
             this.lbVectors.FormattingEnabled = true;
             this.lbVectors.Location = new System.Drawing.Point(4, 166);
-            this.lbVectors.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
+            this.lbVectors.Margin = new System.Windows.Forms.Padding(2);
             this.lbVectors.Name = "lbVectors";
             this.lbVectors.Size = new System.Drawing.Size(453, 290);
             this.lbVectors.TabIndex = 6;
@@ -185,7 +200,7 @@
             this.loadVectorsStart.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
             this.loadVectorsStart.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(192)))), ((int)(((byte)(255)))), ((int)(((byte)(192)))));
             this.loadVectorsStart.Location = new System.Drawing.Point(4, 116);
-            this.loadVectorsStart.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
+            this.loadVectorsStart.Margin = new System.Windows.Forms.Padding(2);
             this.loadVectorsStart.Name = "loadVectorsStart";
             this.loadVectorsStart.Size = new System.Drawing.Size(302, 46);
             this.loadVectorsStart.TabIndex = 5;
@@ -197,7 +212,7 @@
             // 
             this.checkBoxNormalize.AutoSize = true;
             this.checkBoxNormalize.Location = new System.Drawing.Point(4, 97);
-            this.checkBoxNormalize.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
+            this.checkBoxNormalize.Margin = new System.Windows.Forms.Padding(2);
             this.checkBoxNormalize.Name = "checkBoxNormalize";
             this.checkBoxNormalize.Size = new System.Drawing.Size(197, 17);
             this.checkBoxNormalize.TabIndex = 4;
@@ -207,7 +222,7 @@
             // textBoxEpsilon
             // 
             this.textBoxEpsilon.Location = new System.Drawing.Point(4, 68);
-            this.textBoxEpsilon.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
+            this.textBoxEpsilon.Margin = new System.Windows.Forms.Padding(2);
             this.textBoxEpsilon.Name = "textBoxEpsilon";
             this.textBoxEpsilon.Size = new System.Drawing.Size(453, 20);
             this.textBoxEpsilon.TabIndex = 3;
@@ -226,7 +241,7 @@
             // textBoxCountOfNeurons
             // 
             this.textBoxCountOfNeurons.Location = new System.Drawing.Point(4, 29);
-            this.textBoxCountOfNeurons.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
+            this.textBoxCountOfNeurons.Margin = new System.Windows.Forms.Padding(2);
             this.textBoxCountOfNeurons.Name = "textBoxCountOfNeurons";
             this.textBoxCountOfNeurons.Size = new System.Drawing.Size(453, 20);
             this.textBoxCountOfNeurons.TabIndex = 1;
@@ -266,25 +281,21 @@
             // neuralNetworkVisualizer
             // 
             this.neuralNetworkVisualizer.Location = new System.Drawing.Point(975, 24);
-            this.neuralNetworkVisualizer.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
+            this.neuralNetworkVisualizer.Margin = new System.Windows.Forms.Padding(2);
             this.neuralNetworkVisualizer.Matrix = null;
             this.neuralNetworkVisualizer.Name = "neuralNetworkVisualizer";
             this.neuralNetworkVisualizer.Size = new System.Drawing.Size(213, 169);
             this.neuralNetworkVisualizer.TabIndex = 4;
             this.neuralNetworkVisualizer.ZoomFactor = 25;
             // 
-            // button1
+            // successLabel2
             // 
-            this.button1.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
-            this.button1.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(192)))), ((int)(((byte)(255)))), ((int)(((byte)(192)))));
-            this.button1.Location = new System.Drawing.Point(310, 116);
-            this.button1.Margin = new System.Windows.Forms.Padding(2);
-            this.button1.Name = "button1";
-            this.button1.Size = new System.Drawing.Size(147, 46);
-            this.button1.TabIndex = 8;
-            this.button1.Text = "Запустить персептрон";
-            this.button1.UseVisualStyleBackColor = false;
-            this.button1.Click += new System.EventHandler(this.button1_Click);
+            this.successLabel2.AutoSize = true;
+            this.successLabel2.Location = new System.Drawing.Point(283, 53);
+            this.successLabel2.Name = "successLabel2";
+            this.successLabel2.Size = new System.Drawing.Size(10, 13);
+            this.successLabel2.TabIndex = 9;
+            this.successLabel2.Text = " ";
             // 
             // NeuralNetworkForm
             // 
@@ -298,7 +309,7 @@
             this.Controls.Add(this.inputParams);
             this.Controls.Add(this.groupBox1);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.SizableToolWindow;
-            this.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
+            this.Margin = new System.Windows.Forms.Padding(2);
             this.MinimumSize = new System.Drawing.Size(20, 528);
             this.Name = "NeuralNetworkForm";
             this.Text = "Нейронная сеть";
@@ -334,6 +345,7 @@
         private System.Windows.Forms.CheckBox isVisibleOutputVectors;
         private System.Windows.Forms.Label successLabel;
         private System.Windows.Forms.Button button1;
+        private System.Windows.Forms.Label successLabel2;
     }
 }
 

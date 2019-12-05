@@ -109,7 +109,7 @@ namespace NeuralNetworkLibrary
             var Winner = OutputLayer[0][0];
             var min = EuclideanCalculateVectors(pattern, OutputLayer[0][0].Weights);
             for (var i = 0; i < OutputLayer.Count; i++)
-                for (var j = 0; j < OutputLayer[0].Count; j++)
+                for (var j = 0; j < OutputLayer[i].Count; j++)
                 {
                     D = EuclideanCalculateVectors(pattern, OutputLayer[i][j].Weights);
                     if (D < min)
@@ -188,16 +188,16 @@ namespace NeuralNetworkLibrary
             }
         }
 
-        public void AddNeuralLayer(int count, double initialWeight)//public NeuralLayer(int count, double initialWeight, string name = "")
+        public void AddNeuralLayer(int countNeurons, double initialWeight)//public NeuralLayer(int count, double initialWeight, string name = "")
         {
             OutputLayer.Add(new List<Neuron>());
             int lastIndex = OutputLayer.Count-1;
             weightsLayouts.Add(initialWeight);
-            for (int i = 0; i < count; i++)
+            for (int i = 0; i < countNeurons; i++)
             {
                 OutputLayer[lastIndex].Add(new Neuron(lastIndex, i, OutputLayer.Count));
                 OutputLayer[lastIndex][i].Weights = new List<double>(InputLayerDimension);
-                for (int k = 0; k < InputLayerDimension; k++) OutputLayer[lastIndex][i].Weights.Add(initialWeight);
+                for (int k = 0; k < Patterns[0].Count; k++) OutputLayer[lastIndex][i].Weights.Add(initialWeight);
             }
 
             AddDendritesToAllLayers();

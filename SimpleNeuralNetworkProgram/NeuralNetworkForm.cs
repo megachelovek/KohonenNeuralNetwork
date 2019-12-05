@@ -209,11 +209,12 @@ namespace SimpleNeuralNetworkProgram
             var fail = 0;
             var answers = CreateLabelForPerceptron();
             var perceptron = new NeuralNetwork(5, 0, 1);
+            perceptron.Patterns = nn.Patterns;
             perceptron.AddNeuralLayer(4, 0.1); //Количество параметров
             perceptron.AddNeuralLayer(1, 0.1);
             perceptron.Build();
             perceptron.ReadDataFromFile(fileName);
-            perceptron.TrainPerceptron(nn.Patterns, answers, 20);
+            perceptron.TrainPerceptron(nn.Patterns, answers, 200000,1.1);
             perceptron.CreateClassNamesForEachNeuron();
 
             for (var i = 0; i < nn.Patterns.Count; i++)
@@ -228,8 +229,8 @@ namespace SimpleNeuralNetworkProgram
                 var itemText = lbVectors.Items[i].ToString();
                 lbVectors.Items.RemoveAt(i);
                 lbVectors.Items.Insert(i,
-                    itemText + $"<{Winner.className}>");
-                successLabel.Text = $"Успешно={success}/{nn.Patterns.Count}";
+                    itemText + $"  <{Winner.className}>");
+                successLabel2.Text = $"Успешно={success}/{nn.Patterns.Count}";
             }
         }
     }

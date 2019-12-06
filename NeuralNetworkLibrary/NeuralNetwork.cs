@@ -32,6 +32,7 @@ namespace NeuralNetworkLibrary
         public int InputLayerDimension { get; private set; }
         public int OutputLayerDimensionInitialize { get; }
         public double CurrentDelta { get; private set; }
+        public int bias { get; set; } //Пороговое значение
         public SortedList<string, int> ExistentClasses { get; private set; }
 
         #region DefaultNetworkFunctions
@@ -45,11 +46,11 @@ namespace NeuralNetworkLibrary
             CurrentDelta = 100;
             this.isPerceptron = isPerceptron;
         }
-        public NeuralNetwork(int sqrtOfCountNeurons, int numberOfIterations, double valueSko, bool isPerceptron=true)
+        public NeuralNetwork(int sqrtOfCountNeurons, int numberOfIterations, double valueSko,int bias = 7, bool isPerceptron=true) //ПЕРСЕПТРОН
         {
             this.weightsLayouts = new List<double>();
             this.OutputLayer = new List<List<Neuron>>();
-
+            this.bias = bias;
             currentIteration = 1;
             this.numberOfIterations = numberOfIterations;
             valueSKO = valueSko;
@@ -328,6 +329,39 @@ namespace NeuralNetworkLibrary
             for (var index = 0; index < OutputLayer.Count; index++)
             {
                 Optimize(index,lr, 1);
+            }
+        }
+
+        private bool Proceed(List<double> vectorPattern,Neuron neuron)
+        {
+            double net = 0;
+            for (int i = 0; i < vectorPattern.Count; i++)
+            {
+                net += vectorPattern[i] * neuron.Weights[i];
+            }
+
+            return net > bias;
+        }
+
+        private void Increase(List<double> vectorPattern, Neuron neuron,double countToIncrease)
+        {
+            for (int i = 0; i < vectorPattern.Count; i++)
+            {
+                if (vectorPattern[i] == 1)
+                {
+                    neuron.Weights[i]+= countToIncrease;
+                }
+            }
+        }
+
+        private void Decrease(List<double> vectorPattern, Neuron neuron, double countToDecrease)
+        {
+            for (int i = 0; i < vectorPattern.Count; i++)
+            {
+                if (vectorPattern[i] == 1)
+                {
+                    neuron.Weights[i] += countToDecrease;
+                }
             }
         }
 

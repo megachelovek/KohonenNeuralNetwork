@@ -210,8 +210,8 @@ namespace SimpleNeuralNetworkProgram
             var answers = CreateLabelForPerceptron();
             var perceptron = new NeuralNetwork(5, 0, 1);
             perceptron.Patterns = nn.Patterns;
-            perceptron.AddNeuralLayer(4, 0.1); //Количество параметров
-            perceptron.AddNeuralLayer(1, 0.1);
+            perceptron.AddNeuralLayer(6, 0.1); //Количество параметров
+            perceptron.AddNeuralLayer(5, 0.1);
             perceptron.Build();
             perceptron.ReadDataFromFile(fileName);
             perceptron.TrainPerceptron(nn.Patterns, answers, 200000,1.1);

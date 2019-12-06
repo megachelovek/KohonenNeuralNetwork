@@ -111,7 +111,7 @@ namespace NeuralNetworkLibrary
                 for (var index = 0; index < Dendrites.Count; index++)
                 {
                     var terminal = Dendrites[index];
-                    //weights[index] = new_weights;
+                    weights[index] = new_weights;
                     terminal.SynapticWeight = new_weights;
                 }
             }

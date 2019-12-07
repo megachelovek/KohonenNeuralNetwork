@@ -20,7 +20,9 @@ namespace NeuralNetworkLibrary
         private int weightsdimension;
         public double outputPulse;
         public string className;
-
+        public double valueSmthV;
+        public double valueOutputY1;
+        public string perceptronClassInit;
 
         #region DefaultFunctions
 

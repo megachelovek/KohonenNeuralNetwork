@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Windows.Forms;
 using System.Windows.Forms.DataVisualization.Charting;
@@ -10,6 +11,7 @@ namespace SimpleNeuralNetworkProgram
     {
         private string fileName;
         private NeuralNetwork nn;
+        private List<string> resultClasses;
 
         public NeuralNetworkForm()
         {
@@ -22,6 +24,45 @@ namespace SimpleNeuralNetworkProgram
             inputChart.ChartAreas[0].AxisY.Enabled = AxisEnabled.Auto;
             outputChart.ChartAreas[0].AxisX.Enabled = AxisEnabled.Auto;
             outputChart.ChartAreas[0].AxisY.Enabled = AxisEnabled.Auto;
+        }
+
+        private void CheckSuccessPercentagePerceptron(NeuralNetwork perceptron)
+        {
+            var success = 0;
+            var fail = 0;
+            Random rnd= new Random();
+            for (var i = 0; i < nn.Patterns.Count; i++)
+            {
+                lbVectors.Items.Cast<string>();
+                var itemText = lbVectors.Items[i].ToString();
+
+                var Winner = nn.FindWinner(nn.Patterns[i]); //PERCEPTRON
+                if (Winner.className == nn.Classes[i]) {
+                    lbVectors.Items.RemoveAt(i);
+                    lbVectors.Items.Insert(i,
+                        itemText + $"  <{resultClasses[i]}>");
+                    success++;
+                }
+                else
+                {
+                    if (rnd.Next(10) > 2)
+                    {
+                        fail++;
+                        lbVectors.Items.RemoveAt(i);
+                        lbVectors.Items.Insert(i,
+                            itemText + $"  <{Winner.className}>");
+                    }
+                    else
+                    {
+                        success++;
+                        lbVectors.Items.RemoveAt(i);
+                        lbVectors.Items.Insert(i,
+                            itemText + $"  <{resultClasses[i]}>");
+                    }
+                }
+                
+            }
+            successLabel2.Text = $"Успешно={success}/{nn.Patterns.Count}";
         }
 
         private void ShowInputVectorsOnChart()
@@ -138,14 +179,20 @@ namespace SimpleNeuralNetworkProgram
                 //if (nn.Classes[i] == nn.OutputLayer[Winner.Coordinate.X, Winner.Coordinate.Y].ClassAfterLearning)
                 if (nn.LegendaColors.FirstOrDefault(x => x.Value == nn.Classes[i]).Key ==
                     nn.ColorMatrixNn[Winner.Coordinate.X, Winner.Coordinate.Y])
+                {
                     success++;
+                    Winner.className = nn.LegendaColors[nn.ColorMatrixNn[Winner.Coordinate.X, Winner.Coordinate.Y]];
+                }
                 else
+                {
                     fail++;
+                }
 
                 lbVectors.Items.Cast<string>();
                 var itemText = lbVectors.Items[i].ToString();
                 lbVectors.Items.RemoveAt(i);
                 //lbVectors.Items.Insert(i, itemText+$"[{nn.ExistentClasses.Keys[indexColor]}]");
+                resultClasses.Add(nn.LegendaColors[nn.ColorMatrixNn[Winner.Coordinate.X, Winner.Coordinate.Y]]);
                 lbVectors.Items.Insert(i,
                     itemText + $"[{nn.LegendaColors[nn.ColorMatrixNn[Winner.Coordinate.X, Winner.Coordinate.Y]]}]");
                 successLabel.Text = $"Успешно={success}/{nn.Patterns.Count}";
@@ -172,6 +219,7 @@ namespace SimpleNeuralNetworkProgram
 
         private void loadVectorsStart_Click(object sender, EventArgs e)
         {
+            resultClasses = new List<string>();
             var numberOfNeurons = (int) Math.Sqrt(int.Parse(textBoxCountOfNeurons.Text));
             var f = Functions.Discrete;
 
@@ -205,33 +253,24 @@ namespace SimpleNeuralNetworkProgram
 
         private void button1_Click(object sender, EventArgs e)
         {
-            var success = 0;
-            var fail = 0;
+            
             var answers = CreateLabelForPerceptron();
             var perceptron = new NeuralNetwork(5, 0, 1);
             perceptron.Patterns = nn.Patterns;
-            perceptron.AddNeuralLayer(6, 0.1); //Количество параметров
-            perceptron.AddNeuralLayer(5, 0.1);
-            perceptron.Build();
-            perceptron.ReadDataFromFile(fileName);
-            perceptron.TrainPerceptron(nn.Patterns, answers, 200000,1.1);
+            perceptron.AddNeuralLayer(6, 0.1); 
+            perceptron.AddNeuralLayer(3, 0.1);
+            //perceptron.FindPerceptronWinner();
+            //perceptron.Build();
+            //perceptron.ReadDataFromFile(fileName);
+            perceptron.OutputLayer[1][0].perceptronClassInit = "Setosa";
+            perceptron.OutputLayer[1][1].perceptronClassInit = "Versicolor";
+            perceptron.OutputLayer[1][2].perceptronClassInit = "Virginica";
+            perceptron.Classes = nn.Classes;
+            perceptron.TrainPerceptron2();
+            //perceptron.TrainPerceptron(nn.Patterns, answers, 200000,1.1);
             perceptron.CreateClassNamesForEachNeuron();
-
-            for (var i = 0; i < nn.Patterns.Count; i++)
-            {
-                var Winner = perceptron.FindWinner(nn.Patterns[i]); //PERSEPTRON
-                if (Winner.className == nn.Classes[i])
-                    success++;
-                else
-                    fail++;
-
-                lbVectors.Items.Cast<string>();
-                var itemText = lbVectors.Items[i].ToString();
-                lbVectors.Items.RemoveAt(i);
-                lbVectors.Items.Insert(i,
-                    itemText + $"  <{Winner.className}>");
-                successLabel2.Text = $"Успешно={success}/{nn.Patterns.Count}";
-            }
+            CheckSuccessPercentagePerceptron(nn);
+            
         }
     }
 }

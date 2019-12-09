@@ -1,8 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace NeuralNetworkLibrary
 {
@@ -14,10 +10,10 @@ namespace NeuralNetworkLibrary
 
             Y = (float) Math.Exp(-x);
             Y = Y + 1;
-            Y = (float) (1 / (double)Y);
+            Y = (float) (1 / (double) Y);
             return Y;
         }
-        
+
         public float Derivative(float x)
         {
             float Y;
@@ -26,5 +22,4 @@ namespace NeuralNetworkLibrary
             return Y * (1 - Y);
         }
     }
-
 }

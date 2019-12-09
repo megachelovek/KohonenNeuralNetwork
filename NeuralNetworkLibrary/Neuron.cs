@@ -12,17 +12,17 @@ namespace NeuralNetworkLibrary
         private readonly Dictionary<string, int> similarityClassForLearning;
         private readonly int tau2 = 1000;
         public string ClassAfterLearning;
+        public string className;
         private Point coordinate;
         private double Nyu2 = 0.5;
+        public double outputPulse;
+        public string perceptronClassInit;
         private int sigma0;
         private double tau1;
-        private List<double> weights; 
-        private int weightsdimension;
-        public double outputPulse;
-        public string className;
-        public double valueSmthV;
         public double valueOutputY1;
-        public string perceptronClassInit;
+        public double valueSmthV;
+        private List<double> weights;
+        private int weightsdimension;
 
         #region DefaultFunctions
 
@@ -61,7 +61,7 @@ namespace NeuralNetworkLibrary
             avgDelta = avgDelta / weightsdimension;
             return avgDelta;
         }
-        
+
         public void UpdateSimilarMap(string nameClass)
         {
             if (!similarityClassForLearning.ContainsKey(nameClass))
@@ -73,13 +73,9 @@ namespace NeuralNetworkLibrary
         public void SetUpClassNameViaSimilarMap()
         {
             if (similarityClassForLearning.Count == 0)
-            {
                 className = "none";
-            }
             else
-            {
                 className = similarityClassForLearning.Aggregate((x, y) => x.Value > y.Value ? x : y).Key;
-            }
         }
 
         #endregion
@@ -96,12 +92,8 @@ namespace NeuralNetworkLibrary
         {
             double computeValue = 0.0f;
             if (Dendrites != null)
-            {
                 foreach (var d in Dendrites)
-                {
                     computeValue += d.InputPulse * d.SynapticWeight;
-                }
-            }
 
             return computeValue;
         }
@@ -109,14 +101,12 @@ namespace NeuralNetworkLibrary
         public void UpdateWeights(double new_weights)
         {
             if (Dendrites != null)
-            {
                 for (var index = 0; index < Dendrites.Count; index++)
                 {
                     var terminal = Dendrites[index];
                     weights[index] = new_weights;
                     terminal.SynapticWeight = new_weights;
                 }
-            }
         }
 
         private double Activation(double input)
@@ -140,7 +130,7 @@ namespace NeuralNetworkLibrary
         {
             return alpha0 * Math.Exp(-t / tau2);
         }
-        
+
         public List<double> Weights
         {
             get => weights;
@@ -209,6 +199,7 @@ namespace NeuralNetworkLibrary
 
                     break;
                 }
+
                 case Functions.EuclideanMeasure:
                 {
                     distance = Math.Sqrt(Math.Pow(winnerCoordinate.X - coordinate.X, 2) +

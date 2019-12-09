@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace NeuralNetworkLibrary
+﻿namespace NeuralNetworkLibrary
 {
     public class StepFunction : IActivationFunction
     {
@@ -12,22 +6,19 @@ namespace NeuralNetworkLibrary
         {
             if (x >= 0)
                 return 1;
-            else
-                return 0;
-        }
-
-        public float Function(float x, float Theta)
-        {
-            if (x >= Theta)
-                return 1;
-            else
-                return 0;
+            return 0;
         }
 
         public float Derivative(float x)
         {
             return Function(x);
         }
-    }
 
+        public float Function(float x, float Theta)
+        {
+            if (x >= Theta)
+                return 1;
+            return 0;
+        }
+    }
 }

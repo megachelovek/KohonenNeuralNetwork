@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace NeuralNetworkLibrary
+﻿namespace NeuralNetworkLibrary
 {
     public class SignFunction : IActivationFunction
     {
@@ -12,8 +6,7 @@ namespace NeuralNetworkLibrary
         {
             if (x >= 0)
                 return 1;
-            else
-                return -1;
+            return -1;
         }
 
         public float Derivative(float x)
@@ -21,5 +14,4 @@ namespace NeuralNetworkLibrary
             return 0;
         }
     }
-
 }

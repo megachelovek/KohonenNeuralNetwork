@@ -26,18 +26,23 @@ namespace SimpleNeuralNetworkProgram
             outputChart.ChartAreas[0].AxisY.Enabled = AxisEnabled.Auto;
         }
 
+        /// <summary>
+        ///     Подсчитывает количество правильных ответов персептрона
+        /// </summary>
+        /// <param name="perceptron"></param>
         private void CheckSuccessPercentagePerceptron(NeuralNetwork perceptron)
         {
             var success = 0;
             var fail = 0;
-            Random rnd= new Random();
+            var rnd = new Random();
             for (var i = 0; i < nn.Patterns.Count; i++)
             {
                 lbVectors.Items.Cast<string>();
                 var itemText = lbVectors.Items[i].ToString();
 
                 var Winner = nn.FindWinner(nn.Patterns[i]); //PERCEPTRON
-                if (Winner.className == nn.Classes[i]) {
+                if (Winner.className == nn.Classes[i])
+                {
                     lbVectors.Items.RemoveAt(i);
                     lbVectors.Items.Insert(i,
                         itemText + $"  <{resultClasses[i]}>");
@@ -60,8 +65,8 @@ namespace SimpleNeuralNetworkProgram
                             itemText + $"  <{resultClasses[i]}>");
                     }
                 }
-                
             }
+
             successLabel2.Text = $"Успешно={success}/{nn.Patterns.Count}";
         }
 
@@ -86,8 +91,6 @@ namespace SimpleNeuralNetworkProgram
                             double.TryParse(nn.OutputLayer[i][j].Weights[1].ToString(), out var f)
                                 ? ValidateDataForChart(f)
                                 : 0);
-                //.AddXY((object)((double.TryParse(nn.OutputLayer[i, j].Weights[0].ToString(), out double d)) ? (double.IsNaN(nn.OutputLayer[i, j].Weights[0])) ? 0 : (nn.OutputLayer[i, j].Weights[0] < Double.MinValue) ? Double.MinValue : d : 0),
-                //    ((double.TryParse(nn.OutputLayer[i, j].Weights[1].ToString(), out double f)) ? (double.IsNaN(nn.OutputLayer[i, j].Weights[1])) ? 0 : (nn.OutputLayer[i, j].Weights[0] < Double.MinValue) ? Double.MinValue : f : 0));
             }
 
             Application.DoEvents();
@@ -174,9 +177,6 @@ namespace SimpleNeuralNetworkProgram
             for (var i = 0; i < nn.Patterns.Count; i++)
             {
                 var Winner = nn.FindWinner(nn.Patterns[i]);
-                //int indexColor = nn.LegendaColors..IndexOf(nn.ColorMatrixNn[Winner.Coordinate.X, Winner.Coordinate.Y]);
-                //if (nn.Classes[i] == Winner.GetMaxSimilarClass())
-                //if (nn.Classes[i] == nn.OutputLayer[Winner.Coordinate.X, Winner.Coordinate.Y].ClassAfterLearning)
                 if (nn.LegendaColors.FirstOrDefault(x => x.Value == nn.Classes[i]).Key ==
                     nn.ColorMatrixNn[Winner.Coordinate.X, Winner.Coordinate.Y])
                 {
@@ -191,16 +191,11 @@ namespace SimpleNeuralNetworkProgram
                 lbVectors.Items.Cast<string>();
                 var itemText = lbVectors.Items[i].ToString();
                 lbVectors.Items.RemoveAt(i);
-                //lbVectors.Items.Insert(i, itemText+$"[{nn.ExistentClasses.Keys[indexColor]}]");
                 resultClasses.Add(nn.LegendaColors[nn.ColorMatrixNn[Winner.Coordinate.X, Winner.Coordinate.Y]]);
                 lbVectors.Items.Insert(i,
                     itemText + $"[{nn.LegendaColors[nn.ColorMatrixNn[Winner.Coordinate.X, Winner.Coordinate.Y]]}]");
                 successLabel.Text = $"Успешно={success}/{nn.Patterns.Count}";
             }
-
-
-            //SurroundingClass perceptron = new SurroundingClass(nn.Patterns[0].Count,0.1f);
-            //perceptron.TrainPerceptron(nn.Patterns, answers, new IdentityFunction());
         }
 
         /// <summary>
@@ -251,26 +246,21 @@ namespace SimpleNeuralNetworkProgram
             }
         }
 
+        //Не работает!
         private void button1_Click(object sender, EventArgs e)
         {
-            
             var answers = CreateLabelForPerceptron();
             var perceptron = new NeuralNetwork(5, 0, 1);
             perceptron.Patterns = nn.Patterns;
-            perceptron.AddNeuralLayer(6, 0.1); 
+            perceptron.AddNeuralLayer(6, 0.1);
             perceptron.AddNeuralLayer(3, 0.1);
-            //perceptron.FindPerceptronWinner();
-            //perceptron.Build();
-            //perceptron.ReadDataFromFile(fileName);
             perceptron.OutputLayer[1][0].perceptronClassInit = "Setosa";
             perceptron.OutputLayer[1][1].perceptronClassInit = "Versicolor";
             perceptron.OutputLayer[1][2].perceptronClassInit = "Virginica";
             perceptron.Classes = nn.Classes;
             perceptron.TrainPerceptron2();
-            //perceptron.TrainPerceptron(nn.Patterns, answers, 200000,1.1);
             perceptron.CreateClassNamesForEachNeuron();
             CheckSuccessPercentagePerceptron(nn);
-            
         }
     }
 }

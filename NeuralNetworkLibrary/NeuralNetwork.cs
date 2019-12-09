@@ -8,6 +8,7 @@ using NeuralNetworkLibrary.PerceptronLibrary;
 namespace NeuralNetworkLibrary
 {
     public delegate void EndEpochEventHandler(object sender, EndEpochEventArgs e);
+
     public delegate void EndIterationEventHandler(object sender, EventArgs e);
 
     public class NeuralNetwork
@@ -17,18 +18,18 @@ namespace NeuralNetworkLibrary
         private readonly double valueSKO; // Среднеквадратичная ошибка
         private int currentIteration; //Текущая итерация
         private Dictionary<string, int> currentRatingClasses; // Не используется (текущий рейтинг классов)
-        private bool isLearning = true; //Обучается
         private int hiddenLayerDimension;
-        private int numberOfPatterns; //Количество входных векторов
+        private bool isLearning = true; //Обучается
         private bool isPerceptron; //Это персептрон
-        private List<double> weightsLayouts;
         public Dictionary<Color, string> LegendaColors; //Привязка цветов к классам
+        private int numberOfPatterns; //Количество входных векторов
+        private readonly List<double> weightsLayouts;
 
         public List<List<Neuron>> OutputLayer { get; set; }
         public Color[,] ColorMatrixNn { get; private set; }
         public bool Normalize { get; set; }
         public List<List<double>> Patterns { get; set; }
-        public List<string> Classes { get;  set; }
+        public List<string> Classes { get; set; }
         public int InputLayerDimension { get; private set; }
         public int OutputLayerDimensionInitialize { get; }
         public double CurrentDelta { get; private set; }
@@ -37,7 +38,9 @@ namespace NeuralNetworkLibrary
         public List<double> smthV { get; set; }
 
         #region DefaultNetworkFunctions
-        public NeuralNetwork(int sqrtOfCountNeurons, int numberOfIterations, double valueSko, Functions f, bool isPerceptron = false)
+
+        public NeuralNetwork(int sqrtOfCountNeurons, int numberOfIterations, double valueSko, Functions f,
+            bool isPerceptron = false)
         {
             OutputLayerDimensionInitialize = sqrtOfCountNeurons;
             currentIteration = 1;
@@ -47,10 +50,12 @@ namespace NeuralNetworkLibrary
             CurrentDelta = 100;
             this.isPerceptron = isPerceptron;
         }
-        public NeuralNetwork(int sqrtOfCountNeurons, int numberOfIterations, double valueSko,int bias = 7, bool isPerceptron=true) //ПЕРСЕПТРОН
+
+        public NeuralNetwork(int sqrtOfCountNeurons, int numberOfIterations, double valueSko, int bias = 7,
+            bool isPerceptron = true) //ПЕРСЕПТРОН
         {
-            this.weightsLayouts = new List<double>();
-            this.OutputLayer = new List<List<Neuron>>();
+            weightsLayouts = new List<double>();
+            OutputLayer = new List<List<Neuron>>();
             this.bias = bias;
             currentIteration = 1;
             this.numberOfIterations = numberOfIterations;
@@ -91,9 +96,9 @@ namespace NeuralNetworkLibrary
             var Winner = FindWinner(pattern);
             CurrentDelta = 0;
             for (var i = 0; i < OutputLayer.Count; i++)
-                for (var j = 0; j < OutputLayer[0].Count; j++)
-                    CurrentDelta += OutputLayer[i][j].ModifyWeights(pattern, Winner.Coordinate, currentIteration, function,
-                        OutputLayer.Count * OutputLayer[0].Count);
+            for (var j = 0; j < OutputLayer[0].Count; j++)
+                CurrentDelta += OutputLayer[i][j].ModifyWeights(pattern, Winner.Coordinate, currentIteration, function,
+                    OutputLayer.Count * OutputLayer[0].Count);
             currentIteration++;
             CurrentDelta = Math.Abs(CurrentDelta / (OutputLayer.Count * OutputLayer[0].Count));
             var e = new EndEpochEventArgs();
@@ -111,15 +116,15 @@ namespace NeuralNetworkLibrary
             var Winner = OutputLayer[0][0];
             var min = EuclideanCalculateVectors(pattern, OutputLayer[0][0].Weights);
             for (var i = 0; i < OutputLayer.Count; i++)
-                for (var j = 0; j < OutputLayer[i].Count; j++)
+            for (var j = 0; j < OutputLayer[i].Count; j++)
+            {
+                D = EuclideanCalculateVectors(pattern, OutputLayer[i][j].Weights);
+                if (D < min)
                 {
-                    D = EuclideanCalculateVectors(pattern, OutputLayer[i][j].Weights);
-                    if (D < min)
-                    {
-                        min = D;
-                        Winner = OutputLayer[i][j];
-                    }
+                    min = D;
+                    Winner = OutputLayer[i][j];
                 }
+            }
 
             return Winner;
         }
@@ -149,20 +154,16 @@ namespace NeuralNetworkLibrary
                 }
         }
 
-
         #endregion
 
         #region PerceptronFunctions
 
         public void Build()
         {
-            int i = 0;
+            var i = 0;
             foreach (var layer in OutputLayer)
             {
-                if (i >= OutputLayer.Count - 1)
-                {
-                    break;
-                }
+                if (i >= OutputLayer.Count - 1) break;
 
                 var nextLayer = OutputLayer[i + 1];
                 CreateNetwork(layer, nextLayer);
@@ -185,100 +186,79 @@ namespace NeuralNetworkLibrary
                 for (var index = 0; index < connectingTo.Count; index++)
                 {
                     var from = connectingFrom[index];
-                    to.Dendrites.Add(new Dendrite() {InputPulse = from.outputPulse, SynapticWeight = weightsLayouts[index] });
+                    to.Dendrites.Add(new Dendrite
+                        {InputPulse = from.outputPulse, SynapticWeight = weightsLayouts[index]});
                 }
             }
         }
 
-        public void AddNeuralLayer(int countNeurons, double initialWeight)//public NeuralLayer(int count, double initialWeight, string name = "")
+        public void
+            AddNeuralLayer(int countNeurons,
+                double initialWeight) //public NeuralLayer(int count, double initialWeight, string name = "")
         {
             OutputLayer.Add(new List<Neuron>());
-            int lastIndex = OutputLayer.Count-1;
+            var lastIndex = OutputLayer.Count - 1;
             weightsLayouts.Add(initialWeight);
-            for (int i = 0; i < countNeurons; i++)
+            for (var i = 0; i < countNeurons; i++)
             {
                 OutputLayer[lastIndex].Add(new Neuron(lastIndex, i, OutputLayer.Count));
                 OutputLayer[lastIndex][i].Weights = new List<double>(InputLayerDimension);
-                for (int k = 0; k < Patterns[0].Count; k++) OutputLayer[lastIndex][i].Weights.Add(initialWeight);
+                for (var k = 0; k < Patterns[0].Count; k++) OutputLayer[lastIndex][i].Weights.Add(initialWeight);
             }
 
             AddDendritesToAllLayers();
         }
 
-        private void AddDendritesToAllLayers()//public void AddLayer(NeuralLayer layer)
+        private void AddDendritesToAllLayers() //public void AddLayer(NeuralLayer layer)
         {
             for (var index = 0; index < OutputLayer.Count; index++)
             {
                 var element = OutputLayer[index];
-                if (index+1 != OutputLayer.Count)
-                {
+                if (index + 1 != OutputLayer.Count)
                     for (var index1 = 0; index1 < OutputLayer[index].Count; index1++)
                     {
                         var neuron = OutputLayer[index][index1];
-                        int dendriteCount = OutputLayer[index + 1].Count;
-                        if (neuron.Dendrites == null)
-                        {
-                            neuron.Dendrites = new List<Dendrite>();
-                        }
+                        var dendriteCount = OutputLayer[index + 1].Count;
+                        if (neuron.Dendrites == null) neuron.Dendrites = new List<Dendrite>();
 
-                        for (int i = 0; i < dendriteCount; i++)
-                        {
-                            neuron.Dendrites.Add(new Dendrite());
-                        }
+                        for (var i = 0; i < dendriteCount; i++) neuron.Dendrites.Add(new Dendrite());
                     }
-                }
             }
         }
 
         public void Optimize(int numberOfLayer, double learningRate, double delta)
         {
             weightsLayouts[numberOfLayer] += learningRate * delta;
-            foreach (var neuron in OutputLayer[numberOfLayer])
-            {
-                neuron.UpdateWeights(weightsLayouts[numberOfLayer]);
-            }
+            foreach (var neuron in OutputLayer[numberOfLayer]) neuron.UpdateWeights(weightsLayouts[numberOfLayer]);
         }
 
         public void Forward(int numberOfLayer)
         {
-            foreach (var neuron in OutputLayer[numberOfLayer])
-            {
-                neuron.Fire();
-            }
+            foreach (var neuron in OutputLayer[numberOfLayer]) neuron.Fire();
         }
 
-        public void TrainPerceptron(List<List<double>> neuralData, double[] answersNumberOfClass, int iterations, double learningRate = 0.1)
+        public void TrainPerceptron(List<List<double>> neuralData, double[] answersNumberOfClass, int iterations,
+            double learningRate = 0.1)
         {
-            int epoch = 1;
-            //Loop till the number of iterations
+            var epoch = 1;
             while (iterations >= epoch)
             {
-                //Get the input layers
                 var inputLayer = OutputLayer[0];
-                List<double> outputs = new List<double>();
+                var outputs = new List<double>();
 
-                //Loop through the record
-                for (int i = 0; i < neuralData.Count; i++)
+                for (var i = 0; i < neuralData.Count; i++)
                 {
-                    //Set the input data into the first layer
-                    for (int j = 0; j < neuralData[i].Count; j++)
-                    {
-                        inputLayer[j].outputPulse = neuralData[i][j];
-                    }
+                    for (var j = 0; j < neuralData[i].Count; j++) inputLayer[j].outputPulse = neuralData[i][j];
 
-                    //Fire all the neurons and collect the output
                     ComputeOutput();
                     outputs.Add(OutputLayer.Last().First().outputPulse);
                 }
 
-                //Check the accuracy score against Y with the actual output
                 double accuracySum = 0;
-                int y_counter = 0;
-                outputs.ForEach((x) => {
-                    if (x == answersNumberOfClass[y_counter]) 
-                    {
-                        accuracySum++;
-                    }
+                var y_counter = 0;
+                outputs.ForEach(x =>
+                {
+                    if (x == answersNumberOfClass[y_counter]) accuracySum++;
 
                     y_counter++;
                 });
@@ -291,21 +271,15 @@ namespace NeuralNetworkLibrary
 
         public void TrainPerceptron2()
         {
-            Random rnd = new Random();
+            var rnd = new Random();
             foreach (var layer in OutputLayer)
-            {
-                foreach (var neuron in layer)
-                {
-                    for (var index = 0; index < neuron.Weights.Count; index++)
-                    {
-                         neuron.Weights[index]= rnd.NextDouble();
-                    }
-                }
-            }
+            foreach (var neuron in layer)
+                for (var index = 0; index < neuron.Weights.Count; index++)
+                    neuron.Weights[index] = rnd.NextDouble();
             smthV = new List<double>();
             CurrentDelta = 0;
-            int iteration = 1;
-            while (iteration<100 && CurrentDelta < valueSKO) //Пока не станет меньше значения
+            var iteration = 1;
+            while (iteration < 100 && CurrentDelta < valueSKO) //Пока не станет меньше значения
             {
                 var indexLayer = 0;
                 for (var index = 0; index < OutputLayer[indexLayer].Count; index++)
@@ -323,45 +297,30 @@ namespace NeuralNetworkLibrary
                 }
 
                 CurrentDelta = Math.Abs(CurrentDelta / (OutputLayer.Count * OutputLayer[0].Count));
-                
+
                 iteration++;
             }
-
         }
 
-        private void CheckWeightsOutput()
-        {
-
-        }
-        private double TrainSumFunction(int indexLayer,int numberOflayer)
+        private double TrainSumFunction(int indexLayer, int numberOflayer)
         {
             double sum = 0;
             foreach (var neuron in OutputLayer[indexLayer])
-            {
-                foreach (var output in neuron.Weights)
-                {
-                    sum += Yr(neuron) * output;
-                }
-            }
+            foreach (var output in neuron.Weights)
+                sum += Yr(neuron) * output;
             return Math.Tanh(sum);
         }
 
-        private void TrainSumFunctionF2(Neuron neuronMain, int numberOflayer,int iteration)
+        private void TrainSumFunctionF2(Neuron neuronMain, int numberOflayer, int iteration)
         {
             double sum = 0;
             for (var index = 0; index < OutputLayer[numberOflayer].Count; index++)
             {
                 var neuron = OutputLayer[numberOflayer][index];
                 var vTemp = neuron.valueSmthV;
-                foreach (var output in neuronMain.Weights)
-                {
-                    sum += vTemp * output;
-                }
+                foreach (var output in neuronMain.Weights) sum += vTemp * output;
 
-                if (Classes[index] != neuron.perceptronClassInit)
-                {
-                    neuron.valueOutputY1 = 1/ iteration;
-                }
+                if (Classes[index] != neuron.perceptronClassInit) neuron.valueOutputY1 = 1 / iteration;
             }
 
             neuronMain.valueOutputY1 = Math.Tanh(sum);
@@ -374,10 +333,10 @@ namespace NeuralNetworkLibrary
 
         private void ComputeOutput()
         {
-            bool first = true;
-            for (int i = 0; i < OutputLayer.Count; i++)
+            var first = true;
+            for (var i = 0; i < OutputLayer.Count; i++)
             {
-                List<Neuron> layer = OutputLayer[i];
+                var layer = OutputLayer[i];
                 //Skip first layer as it is input
                 if (first)
                 {
@@ -391,61 +350,14 @@ namespace NeuralNetworkLibrary
 
         private void OptimizeWeights(double accuracy)
         {
-            float lr = 0.1f;
+            var lr = 0.1f;
             //Skip if the accuracy reached 100%
-            if (accuracy == 1)
-            {
-                return;
-            }
+            if (accuracy == 1) return;
 
-            if (accuracy > 1)
-            {
-                lr = -lr;
-            }
+            if (accuracy > 1) lr = -lr;
 
             //Update the weights for all the layers
-            for (var index = 0; index < OutputLayer.Count; index++)
-            {
-                Optimize(index,lr, 1);
-            }
-        }
-
-        //private bool Proceed(List<double> vectorPattern,Neuron neuron)
-        //{
-        //    double net = 0;
-        //    for (int i = 0; i < vectorPattern.Count; i++)
-        //    {
-        //        net += vectorPattern[i] * neuron.Weights[i];
-        //    }
-
-        //    return net > bias;
-        //}
-
-        //private void Increase(List<double> vectorPattern, Neuron neuron,double countToIncrease)
-        //{
-        //    for (int i = 0; i < vectorPattern.Count; i++)
-        //    {
-        //        if (vectorPattern[i] == 1)
-        //        {
-        //            neuron.Weights[i]+= countToIncrease;
-        //        }
-        //    }
-        //}
-
-        //private void Decrease(List<double> vectorPattern, Neuron neuron, double countToDecrease)
-        //{
-        //    for (int i = 0; i < vectorPattern.Count; i++)
-        //    {
-        //        if (vectorPattern[i] == 1)
-        //        {
-        //            neuron.Weights[i] += countToDecrease;
-        //        }
-        //    }
-        //}
-
-        public Neuron FindPerceptronWinner(List<double> vectorPattern, List<Neuron> layer)
-        {
-            return null;
+            for (var index = 0; index < OutputLayer.Count; index++) Optimize(index, lr, 1);
         }
 
         #endregion
@@ -504,9 +416,10 @@ namespace NeuralNetworkLibrary
                     LegendaColors.Add(Color.FromArgb(100, rnd.Next(255), rnd.Next(125) * rnd.Next(2), rnd.Next(255)),
                         classs.Key);
             }
+
             for (var i = 0; i < OutputLayerDimensionInitialize; i++)
-                for (var j = 0; j < OutputLayerDimensionInitialize; j++)
-                    colorMatrix[i, j] = Color.FromKnownColor(KnownColor.ButtonFace);
+            for (var j = 0; j < OutputLayerDimensionInitialize; j++)
+                colorMatrix[i, j] = Color.FromKnownColor(KnownColor.ButtonFace);
 
             for (var i = 0; i < Patterns.Count; i++)
             {
@@ -528,14 +441,9 @@ namespace NeuralNetworkLibrary
             }
 
             foreach (var layer in OutputLayer)
-            {
-                foreach (var neuron in layer)
-                {
-                    neuron.SetUpClassNameViaSimilarMap();
-                }
-            }
+            foreach (var neuron in layer)
+                neuron.SetUpClassNameViaSimilarMap();
         }
-
 
         /// <summary>
         ///     Берет данные из файла и приводит к нужному формату с которого можно считать
@@ -605,16 +513,12 @@ namespace NeuralNetworkLibrary
                 if (!currentRatingClasses.ContainsKey(cl))
                     currentRatingClasses.Add(cl, 0);
 
-            if (OutputLayer == null )
-            {
-                OutputLayer = InitializeOutputLayer(OutputLayerDimensionInitialize);
-            }
-
+            if (OutputLayer == null) OutputLayer = InitializeOutputLayer(OutputLayerDimensionInitialize);
         }
 
         private List<List<Neuron>> InitializeOutputLayer(int dimension)
         {
-            List<List<Neuron>> result = new List<List<Neuron>>();
+            var result = new List<List<Neuron>>();
             // (2) Этап Заполнение случайными весами 
             var r = new Random();
             for (var i = 0; i < dimension; i++)
@@ -624,9 +528,10 @@ namespace NeuralNetworkLibrary
                 {
                     result[i].Add(new Neuron(i, j, dimension));
                     result[i][j].Weights = new List<double>(InputLayerDimension);
-                    for (int k = 0; k < InputLayerDimension; k++) result[i][j].Weights.Add(r.NextDouble());
+                    for (var k = 0; k < InputLayerDimension; k++) result[i][j].Weights.Add(r.NextDouble());
                 }
             }
+
             return result;
         }
 
